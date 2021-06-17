@@ -1,2 +1,2 @@
 # projekt
- psio lab sem 2
+ psio lab sem  Wojciech Bergmański A7 L13
