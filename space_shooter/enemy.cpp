@@ -5,49 +5,61 @@ Enemy::Enemy()
 
 }
 
-const sf::FloatRect Enemy::getBounds() const
+
+sf::FloatRect Enemy::getBounds() // tu musi byc kopia bo bedzie sie bugowac (pamiec dynamiczna)
 {
     return this->shape.getGlobalBounds();
 }
-
-//sf::Vector2i getRandomPosition(int &res_x, int &res_y)
-//{
-//    int x = 0;
-//    int y = 0;
-
-//    do
-//    {
-//        x = rand() % res_x;
-//        y = rand() % res_y;
-//    }
-//    while ( (y > res_y/2) );
-
-//    return sf::Vector2i(x,y);
-//}
+const sf::Vector2f &Enemy::getPos() const
+{
+    return this->shape.getPosition();
+}
 
 void Enemy::initializeVariables()
 {
-    this->type =0;
-    this->HP =0;
-    this->HPMax =2;
-    this->damage =1;
-    this->points = 5;
+    this->damage = 1;
+    this->attackCooldownMax = 100.f;
+    this->attackCooldown = this->attackCooldownMax;
 }
 
+bool Enemy::canAttack()
+{
+    if(this->attackCooldown >= this->attackCooldownMax)
+    {
+        this->attackCooldown = 0.f;
+        return true;
+    }
+    if(this->attackCooldown < this->attackCooldownMax)
+    {
+        this->attackCooldown++;
+    }
+    return false;
+}
 
+void Enemy::updateAttack()
+{
+    if(this->attackCooldown < this->attackCooldownMax)
+    {
+    this->attackCooldown += 1.f;
+    }
+}
 
-Enemy::Enemy(sf::Texture *texture, float posX, float posY, float dirX, float dirY, float movement_speed)
+Enemy::Enemy(sf::Texture *texture, float posX, float posY, float dirX, float dirY, float movement_speed, float scaleX, float scaleY, int hp)
+    :    damage(1),
+         attackCooldownMax(100.f),
+         attackCooldown(attackCooldownMax)
 {
 //    posX = getRandomPosition(500,800).first;
     this->initializeVariables();
     this->shape.setTexture(*texture);
 
     this->shape.setPosition(posX,posY);
-    this->shape.scale(0.7,0.7);
+    this->shape.scale(scaleX,scaleY);
     this->direction.x = dirX;
     this->direction.y = dirY;
     this->movementSpeed = movement_speed;
     this->shape.setOrigin(93/2,84/2);
+    this->HP = hp;
 }
 
 Enemy::~Enemy()
@@ -55,15 +67,26 @@ Enemy::~Enemy()
 
 }
 
+const int &Enemy::getHP() const
+{
+    return this->HP;
+}
+
+void Enemy::decreaseHP()
+{
+    this->HP--;
+}
+
+
+int Enemy::Hit()
+{
+    return damage;
+}
 
 
 void Enemy::update()
 {
-
         sf::FloatRect rectangle_bounds = this->shape.getGlobalBounds();
-
-
-
 
         if(rectangle_bounds.top+rectangle_bounds.height > 400) // wartosci stale
         {
@@ -77,13 +100,11 @@ void Enemy::update()
         {
             direction.x = -(direction.x);
         }
-        if(rectangle_bounds.left  < 0)
+        if(rectangle_bounds.left < 0) //rectangle_bounds.left  < 0 dla tego przypadku dziwnie nie dziala
         {
             direction.x = -(direction.x);
         }
-        else {
-            this->shape.move(this->movementSpeed * this->direction);
-        }
+        this->shape.move(this->movementSpeed * this->direction);
 }
 
 void Enemy::render(sf::RenderTarget *target)

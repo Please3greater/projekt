@@ -14,19 +14,26 @@ private:
     int HP;
     int HPMax;
     int damage;
-    int points;
+    float attackCooldownMax;
+    float attackCooldown;
 
     void initializeVariables();
 
 public:
     Enemy();
-    Enemy(sf::Texture *texture, float posX, float posY, float dirX, float dirY, float movement_speed);
+    Enemy(sf::Texture *texture, float posX, float posY, float dirX, float dirY, float movement_speed, float scaleX, float scaleY, int hp);
     virtual ~Enemy();
 
-    // krawedzie pocisku
-    const sf::FloatRect getBounds() const;
+    // krawedzie statku
+    sf::FloatRect getBounds();
+    const sf::Vector2f &getPos() const;
 
-//    sf::Vector2i getRandomPosition(int &res_x, int &res_y);
+    // HP
+    const int &getHP() const;
+    void decreaseHP(); //int damage
+    int Hit();
+
+    bool canAttack();
     void updateAttack();
     void update();
     void render(sf::RenderTarget *target);
