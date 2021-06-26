@@ -10,6 +10,11 @@ const sf::FloatRect Bullet::getBounds() const
     return this->shape.getGlobalBounds();
 }
 
+const sf::Vector2f &Bullet::getPos() const
+{
+    return this->shape.getPosition();
+}
+
 Bullet::Bullet(sf::Texture *texture, float posX, float posY, float dirX, float dirY, float movement_speed)
 {
     this->shape.setTexture(*texture);
@@ -28,6 +33,7 @@ Bullet::~Bullet()
 
 void Bullet::update()
 {
+//    this->direction = ;
     this->shape.move(this->movementSpeed * this->direction);
 }
 

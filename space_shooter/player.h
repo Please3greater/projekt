@@ -8,7 +8,7 @@
 class Player : public sf::Sprite
 {
 private:
-    sf::Sprite sprite;
+//    sf::Sprite sprite;
     sf::Texture texture;
     float movementSpeed;
     float attackCooldownMax;
@@ -19,31 +19,33 @@ private:
 
     int damage;
 
-    // funckje prywatne
-    void initializeTexture();
-    void initializeSprite();
+
 
 public:
     Player();
     virtual ~Player();
 
     //getter do pozycji gracza dla pocisku
-    const sf::Vector2f &getPos() const;
-    const sf::FloatRect getBounds() const;
+    const sf::Vector2f &getPos(Player *sprite) const;
+    const sf::FloatRect getBounds(Player *sprite) const;
 
-    void setPosition(const sf::Vector2f pos);
-    void setPosition(const float x, const float y);
+//    void setPosition(const sf::Vector2f pos);
+    void setPosition2(Player *sprite, const float x, const float y);
 
     //funkcje
-    void animate(const float dirX, const float dirY);
-    int getHP() ;
-    int getHPMax();
-    void decreaseHP(int damage);
-    int Hit();
-    bool canAttack();
+    void animate(Player *sprite, const float dirX, const float dirY);
+    int getHP(Player *sprite) ;
+    int getHPMax(Player *sprite);
+    void decreaseHP(Player *sprite, int damage);
+//    int Hit(Player *sprite);
+    bool canAttack(Player* player);
     void updateAttack();
-    void update();
-    void render(sf::RenderTarget &target);
+    void update(Player* player);
+    void render(Player* player, sf::RenderTarget &target);
+
+    // funckje prywatne
+    void initializeTexture();
+    void initializeSprite(Player *sprite);
 };
 
 #endif // PLAYER_H

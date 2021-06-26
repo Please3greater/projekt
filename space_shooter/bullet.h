@@ -10,7 +10,6 @@ class Bullet
 {
 private:
     sf::Sprite shape;
-
     sf::Vector2f direction;
     float movementSpeed;
 
@@ -21,6 +20,7 @@ public:
 
     // krawedzie pocisku
     const sf::FloatRect getBounds() const;
+    const sf::Vector2f &getPos() const;
 
     void updateAttack();
     void update();

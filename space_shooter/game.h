@@ -19,7 +19,10 @@ private:
     int window_width = 500;
     int window_height = 800;
 
+    // strzelanie i obrot w kierunku myszy
     sf::Vector2f mouse_position;
+    sf::Vector2f aimDir;
+    sf::Vector2f aimDirNorm;
 
     // zycie w rogu ekranu
     sf::Font font;
@@ -40,7 +43,7 @@ private:
     sf::Texture texture_background;
     sf::Sprite background;
 
-    // set postaci w grze
+    // set naszej postaci w grze
     Player* player; //wskaznik typu Player ( utworzenie )
     unsigned HP;
     unsigned HPMax;

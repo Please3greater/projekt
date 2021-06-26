@@ -65,10 +65,11 @@ void Game::initializePlayer()
 {
     this->player = new Player();
 
-
-
-    this->HP = this->player->getHP();
-    this->HPMax = this->player->getHPMax();
+    this->player->setPosition2(player, 250, 640);
+    this->player->initializeTexture();
+    this->player->initializeSprite(player);
+//    this->HP = this->player->getHP();
+    this->HPMax = this->player->getHPMax(player);
 }
 
 void Game::initializeEnemies()
@@ -130,7 +131,7 @@ void Game::run()
     while(this->window->isOpen())
     {
         this->updateEvents();
-        if(player->getHP() >0)
+        if(player->getHP(player) >0)
         {
             this->update();
         }
@@ -152,47 +153,64 @@ void Game::updateEvents()
 }
 
 void Game::updateInput()
-{
-    // Ruszanie sie naszego statku
+{                                                                                                // FACE TO MOUSE
+    sf::Vector2f curPos;                                                                        // POZYCJA OBIEKTU
+    curPos.x = player->getPos(player).x;
+    curPos.y = player->getPos(player).y;
+
+    //        sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
+
+    sf::Vector2f mouse_position = window->mapPixelToCoords(sf::Mouse::getPosition(*window));    // POZYCJA MYSZY
+    float dx = curPos.x - mouse_position.x;
+    float dy = curPos.y - mouse_position.y;
+    const float PI = 3.14159265;
+    float rotation = std::atan2(dy,dx)*180.0/PI;
+
+    //debuger
+    std::cout<<mouse_position.x<<"\t"<<mouse_position.y<<std::endl;
+
+    player->setRotation(rotation-90);
+
+
+//    for(auto *bull : bullets)
+//    {
+//        sf::Vector2f curPos;                                                                        // POZYCJA OBIEKTU
+//        curPos.x = bull->getPos().x;
+//        curPos.y = bull->getPos().y;
+
+//        bull->setRotation(roration-90);    // pociski tez trzeba dziedziczyc po sf::Sprite, tak samo jak playera, zeby mozna bylo uzyc setRotation
+//    }
+
+
+
+    // Ruszanie sie naszego statku                                                      // OBSLUGA KLAWISZY   ( RUCH )
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        this->player->animate(0.f,-1.f);
+        player->animate(player,0.f,-1.f);
     }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        this->player->animate(0.f,1.f);
+        player->animate(player,0.f,1.f);
     }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-        this->player->animate(-1.f,0.f);
+        player->animate(player,-1.f,0.f);
     }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-        this->player->animate(1.f,0.f);
+        player->animate(player,1.f,0.f);
     }
-    if( player->canAttack())                                                        // NASZE POCISKI
+    if( player->canAttack(player))                                                        // NASZE POCISKI
     {
-        this->bullets.push_back(new Bullet(this->textures["BULLET"], this->player->getPos().x,this->player->getPos().y,0.f,-10.f,2.f));
-    //          this->enemies.push_back(new Enemy(this->textures["ENEMY1"], this->player->getPos().x,this->player->getPos().y,0.f,-10.f,1.f));
+        aimDir = mouse_position - player->getPos(player);
+        aimDirNorm = aimDir / static_cast<float>(sqrt(pow(aimDir.x, 2) + pow(aimDir.y, 2)));
+
+//        std::cout<<mouse_position.x<<"\t"<<mouse_position.y<<std::endl;
+        this->bullets.push_back(new Bullet(this->textures["BULLET"],
+                                player->getPos(player).x,
+                                player->getPos(player).y,
+                                aimDirNorm.x, //mouse_position.x //0.f
+                                aimDirNorm.y, // mouse_position.y //-10.f
+                                10.f));
     }
-
-    if (1)                                                                                      //FACE TO MOUSE
-    {
-        sf::Vector2f curPos;                                                                    // POZYCJA OBIEKTU
-        curPos.x = player->getPos().x;
-        curPos.y = player->getPos().y;
-
-//        sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
-
-        sf::Vector2f mouse_position = window->mapPixelToCoords(sf::Mouse::getPosition(*window));  // POZYCJA MYSZY
-        float dx = curPos.x - mouse_position.x;
-        float dy = curPos.y - mouse_position.y;
-        const float PI = 3.14159265;
-        float rotation = std::atan2(dy,dx)*180.0/PI;
-
-        //debuger
-        std::cout<<mouse_position.x<<"\t"<<mouse_position.y<<std::endl;
-
-        player->setRotation(rotation-90);
-    }
-
 }
+
 
 void Game::updateBullets()
 {
@@ -242,7 +260,7 @@ void Game::updateEnemyBullets()
         bull->update();
 
         //usuwanie pociskow
-        if(bull->getBounds().top > window_height or player->getBounds().intersects(bull->getBounds()))
+        if(bull->getBounds().top > window_height or player->getBounds(player).intersects(bull->getBounds()))
         {
             //usuwanie konkretnego wskaznika
             delete this->enemy_bullets.at(counter);
@@ -330,7 +348,7 @@ void Game::updateEnemies()                                                      
     }
 }
 
-void Game::updateCombat()                                               // KOLIZJE
+void Game::updateCombat()                                               // KOLIZJE WALKA
 {
     // kolizje naszych pociskow ze statkami wroga
     for (int i = 0; i < static_cast<int>(this->enemies.size()); i++)
@@ -357,11 +375,11 @@ void Game::updateCombat()                                               // KOLIZ
 
 
         //kolizje naszego statku ze statkami wroga
-        if (player->getBounds().intersects(enemies[i]->getBounds()))
+        if (player->getBounds(player).intersects(enemies[i]->getBounds()))
         {
             enemies[i]->decreaseHP();
-            player->decreaseHP(this->enemies[i]->Hit());
-                std::cout<<player->getHP()<<std::endl;
+            player->decreaseHP(player,this->enemies[i]->Hit());
+                std::cout<<player->getHP(player)<<std::endl;
         }
     }
 
@@ -371,11 +389,11 @@ void Game::updateCombat()                                               // KOLIZ
     {
         for(auto &b : enemy_bullets)
         {
-            if(b->getBounds().intersects(player->getBounds()))
+            if(b->getBounds().intersects(player->getBounds(player)))
             {
-                player->decreaseHP(e->Hit());
+                player->decreaseHP(player, e->Hit());
                 //DEBUGER
-                std::cout<< this->player->getHP() << std::endl;
+                std::cout<< this->player->getHP(player) << std::endl;
             }
         }
     }
@@ -401,7 +419,7 @@ void Game::updateGUI()
     std::stringstream ss;
     std::stringstream ss2;
 
-    ss << player->getHP();
+    ss << player->getHP(player);
     ss << "/";
     ss << HPMax;
     this->myText.setString(ss.str());
@@ -411,7 +429,7 @@ void Game::update()
 {
 //    this->updateEvents();
     this->updateInput();
-    this->player->update();
+    this->player->update(player);
     this->updateBullets();
     this->updateEnemyBullets();
     this->updateEnemies();
@@ -440,7 +458,7 @@ void Game::render()
 
     // rysowanie wszystkiego
     this->renderBackground();
-    this->player->render(*this->window);
+    this->player->render(player,*this->window);
 
     for (auto *bull : bullets)
     {
@@ -457,7 +475,7 @@ void Game::render()
     this->renderGUI();
 
     //gave over text
-    if(player->getHP() <=0)
+    if(player->getHP(player) <=0)
     {
         this->window->draw(this->GameOver_text);
     }
