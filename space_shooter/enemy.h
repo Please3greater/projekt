@@ -17,8 +17,6 @@ private:
     float attackCooldownMax;
     float attackCooldown;
 
-    void initializeVariables();
-
 public:
     Enemy();
     Enemy(sf::Texture *texture, float posX, float posY, float dirX, float dirY, float movement_speed, float scaleX, float scaleY, int hp);

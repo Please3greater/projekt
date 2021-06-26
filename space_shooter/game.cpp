@@ -65,6 +65,8 @@ void Game::initializePlayer()
 {
     this->player = new Player();
 
+
+
     this->HP = this->player->getHP();
     this->HPMax = this->player->getHPMax();
 }
@@ -187,7 +189,7 @@ void Game::updateInput()
         //debuger
         std::cout<<mouse_position.x<<"\t"<<mouse_position.y<<std::endl;
 
-//        player->setRotation(rotation-90);
+        player->setRotation(rotation-90);
     }
 
 }

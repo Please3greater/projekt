@@ -41,7 +41,7 @@ private:
     sf::Sprite background;
 
     // set postaci w grze
-    Player* player;
+    Player* player; //wskaznik typu Player ( utworzenie )
     unsigned HP;
     unsigned HPMax;
 

@@ -5,7 +5,7 @@
 #include<SFML/Graphics.hpp>
 #include<SFML/System.hpp>
 
-class Player
+class Player : public sf::Sprite
 {
 private:
     sf::Sprite sprite;

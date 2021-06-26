@@ -1,8 +1,10 @@
 #include "enemy.h"
 
 Enemy::Enemy()
+:      damage(1),
+       attackCooldownMax(100.f),
+       attackCooldown(attackCooldownMax)
 {
-
 }
 
 
@@ -13,13 +15,6 @@ sf::FloatRect Enemy::getBounds() // tu musi byc kopia bo bedzie sie bugowac (pam
 const sf::Vector2f &Enemy::getPos() const
 {
     return this->shape.getPosition();
-}
-
-void Enemy::initializeVariables()
-{
-    this->damage = 1;
-    this->attackCooldownMax = 100.f;
-    this->attackCooldown = this->attackCooldownMax;
 }
 
 bool Enemy::canAttack()
@@ -50,7 +45,6 @@ Enemy::Enemy(sf::Texture *texture, float posX, float posY, float dirX, float dir
          attackCooldown(attackCooldownMax)
 {
 //    posX = getRandomPosition(500,800).first;
-    this->initializeVariables();
     this->shape.setTexture(*texture);
 
     this->shape.setPosition(posX,posY);
