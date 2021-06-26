@@ -5,6 +5,7 @@
 #include "player.h"
 #include "bullet.h"
 #include "enemy.h"
+#include "bonus.h"
 #include <map>
 #include <string>
 #include <sstream>
@@ -33,11 +34,13 @@ private:
     //licznik do spawnu wrogow
     float spawnRule;
 
-    //Textures
+    //Textury
     std::map<std::string, sf::Texture*> textures;
+
     std::vector<Bullet*> bullets;            // nasze pociski
-    std::vector<Bullet*> enemy_bullets;      // pociski wroga
-    std::vector<Enemy *> enemies;
+    std::vector<Bullet*> enemy_bullets;     // pociski wroga
+    std::vector<Enemy*> enemies;           // wrogowie
+    std::vector<Bonus*> bonuses;          // bonusy
 
     //tlo
     sf::Texture texture_background;
@@ -68,6 +71,7 @@ public:
    void updateGUI();
    void updateBullets();
    void updateEnemyBullets();
+   void updateBonuses();
    void updateTimer();
    bool canAttack();
    void updateEnemies();

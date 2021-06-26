@@ -4,6 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+        bonus.cpp \
         bullet.cpp \
         enemy.cpp \
         game.cpp \
@@ -19,6 +20,7 @@ CONFIG(debug, debug|release){
 }
 
 HEADERS += \
+    bonus.h \
     bullet.h \
     enemy.h \
     game.h \

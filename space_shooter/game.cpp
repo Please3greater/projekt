@@ -19,6 +19,8 @@ void Game::initializeTextures()
     this->textures["ENEMY2"]->loadFromFile("./../space_shooter/enemy2.png");
     this->textures["ENEMY3"] = new sf::Texture();
     this->textures["ENEMY3"]->loadFromFile("./../space_shooter/enemy3.png");
+    this->textures["BONUS1"] = new sf::Texture();
+    this->textures["BONUS1"]->loadFromFile("./../space_shooter/bonus1.png");
 }
 
 void Game::initializeBackground()
@@ -30,7 +32,7 @@ void Game::initializeBackground()
     background.setTexture(texture_background);
     background.setPosition(0,0);
     background.setOrigin(78,0);
-    background.setScale(0.9,0.9);
+    background.setScale(1,1);
 }
 
 
@@ -108,6 +110,11 @@ Game::~Game()
     for (auto &bull : enemy_bullets)
     {
         delete bull;
+    }
+    //usuwanie bonusow
+    for (auto &bon : bonuses)
+    {
+        delete bon;
     }
 
     //usuwanie wrogow
@@ -205,8 +212,8 @@ void Game::updateInput()
         this->bullets.push_back(new Bullet(this->textures["BULLET"],
                                 player->getPos(player).x,
                                 player->getPos(player).y,
-                                aimDirNorm.x, //mouse_position.x //0.f
-                                aimDirNorm.y, // mouse_position.y //-10.f
+                                aimDirNorm.x,
+                                aimDirNorm.y,
                                 10.f));
     }
 }
@@ -273,6 +280,33 @@ void Game::updateEnemyBullets()
 //        std::cout<< "Liczba pociskow na ekranie: ";
 //        std::cout<< this->bullets.size() << std::endl;
         ++counter;
+    }
+}
+
+void Game::updateBonuses()
+{
+    int counter = 0;
+    for (auto *bon : bonuses)
+    {
+        bon->update();
+
+        if(bon->getBounds().top + bon->getBounds().height > window_height)
+        {
+            //usuwanie konkretnego wskaznika
+            delete this->bonuses.at(counter);
+
+            //usuwanie go z wektora
+            this->bonuses.erase(this->bonuses.begin()+counter);
+            --counter;
+        }
+        if( player->getBounds(player).intersects( bon->getBounds() ) )
+        {
+            player->increaseHP(player,bon->heal());
+            delete this->bonuses.at(counter);
+
+            this->bonuses.erase(this->bonuses.begin()+counter);
+            --counter;
+        }
     }
 }
 
@@ -366,6 +400,16 @@ void Game::updateCombat()                                               // KOLIZ
                 {
                     //usuwanie obiektu z wektora
                     this->enemies.erase(this->enemies.begin() +i);
+
+                    if (rand()%10 < 3) // szansa na wypadniecie tego konretnego bonusu
+                    {
+                        this->bonuses.push_back(new Bonus(this->textures["BONUS1"],
+                                                enemies[i]->getPos().x,//50
+                                                enemies[i]->getPos().y, //100
+                                                0.f,
+                                                10.f,
+                                                1.0f));
+                    }
                 }
             }
             // debugowanie
@@ -433,6 +477,7 @@ void Game::update()
     this->updateBullets();
     this->updateEnemyBullets();
     this->updateEnemies();
+    this->updateBonuses();
     this->updateCombat();
     this->updateGUI();
 }
@@ -463,6 +508,10 @@ void Game::render()
     for (auto *bull : bullets)
     {
         bull->render(this->window);
+    }
+    for (auto *bon : bonuses)
+    {
+        bon->render(this->window);
     }
     for (auto *bull : enemy_bullets)
     {

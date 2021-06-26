@@ -33,7 +33,6 @@ Bullet::~Bullet()
 
 void Bullet::update()
 {
-//    this->direction = ;
     this->shape.move(this->movementSpeed * this->direction);
 }
 

@@ -37,6 +37,7 @@ public:
     int getHP(Player *sprite) ;
     int getHPMax(Player *sprite);
     void decreaseHP(Player *sprite, int damage);
+    void increaseHP(Player *sprite, int damage);
 //    int Hit(Player *sprite);
     bool canAttack(Player* player);
     void updateAttack();

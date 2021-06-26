@@ -68,6 +68,11 @@ void Player::decreaseHP(Player *sprite, int damage)
     sprite->HP -= damage;
 }
 
+void Player::increaseHP(Player *sprite, int damage)
+{
+    sprite->HP = HP + damage;
+}
+
 //int Player::Hit(Player *sprite)
 //{
 //    return sprite->damage;
