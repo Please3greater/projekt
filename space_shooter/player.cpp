@@ -4,7 +4,7 @@
 void Player::initializeTexture()
 {
     // wczytywanie tekstur
-    if (!this->texture.loadFromFile("./../space_shooter/nasz.png"))
+    if (!this->texture.loadFromFile("./../space_shooter/Tekstury/nasz.png"))
     {
         std::cout<<"Error occured in player texture loading"<<std::endl;
     }

@@ -64,7 +64,7 @@ public:
     virtual ~Game();
 
    //funkcje publiczne
-//   std::pair<int,int> getRandomPosition(int res_x, int res_y, int dead_zone);
+   std::pair<float,float> getRandomPosition(int res_x, int res_y, int dead_zone);
    void run();
    void updateEvents();
    void updateInput();

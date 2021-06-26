@@ -10,22 +10,22 @@ void Game::initializeWindow()
 void Game::initializeTextures()
 {
     this->textures["BULLET"] = new sf::Texture();
-    this->textures["BULLET"]->loadFromFile("./../space_shooter/pocisk1.png");
+    this->textures["BULLET"]->loadFromFile("./../space_shooter/Tekstury/pocisk1.png");
     this->textures["BULLET2"] = new sf::Texture();
-    this->textures["BULLET2"]->loadFromFile("./../space_shooter/pocisk2.png");
+    this->textures["BULLET2"]->loadFromFile("./../space_shooter/Tekstury/pocisk2.png");
     this->textures["ENEMY1"] = new sf::Texture();
-    this->textures["ENEMY1"]->loadFromFile("./../space_shooter/enemy1.png");
+    this->textures["ENEMY1"]->loadFromFile("./../space_shooter/Tekstury/enemy1.png");
     this->textures["ENEMY2"] = new sf::Texture();
-    this->textures["ENEMY2"]->loadFromFile("./../space_shooter/enemy2.png");
+    this->textures["ENEMY2"]->loadFromFile("./../space_shooter/Tekstury/enemy2.png");
     this->textures["ENEMY3"] = new sf::Texture();
-    this->textures["ENEMY3"]->loadFromFile("./../space_shooter/enemy3.png");
+    this->textures["ENEMY3"]->loadFromFile("./../space_shooter/Tekstury/enemy3.png");
     this->textures["BONUS1"] = new sf::Texture();
-    this->textures["BONUS1"]->loadFromFile("./../space_shooter/bonus1.png");
+    this->textures["BONUS1"]->loadFromFile("./../space_shooter/Tekstury/bonus1.png");
 }
 
 void Game::initializeBackground()
 {
-    if(!this->texture_background.loadFromFile("./../space_shooter/tlo.jpg"))
+    if(!this->texture_background.loadFromFile("./../space_shooter/Tekstury/tlo.jpg"))
     {
         std::cout<<"Blad wczytywanie tekstury tla"<<std::endl;
     }
@@ -39,7 +39,7 @@ void Game::initializeBackground()
 void Game::initializeGUI()
 {
     //zaladowanie fontow
-    if(!this->font.loadFromFile("./../space_shooter/font.ttf"))
+    if(!this->font.loadFromFile("./../space_shooter/Fonty/font.ttf"))
     {
         std::cout<<"Blad wczytywanie fontu"<<std::endl;
     }
@@ -70,7 +70,6 @@ void Game::initializePlayer()
     this->player->setPosition2(player, 250, 640);
     this->player->initializeTexture();
     this->player->initializeSprite(player);
-//    this->HP = this->player->getHP();
     this->HPMax = this->player->getHPMax(player);
 }
 
@@ -315,31 +314,32 @@ void Game::updateTimer()
     spawnRule++;
 }
 
-//std::pair<float,float> getRandomPosition(int res_x, int res_y, int dead_zone)
-//{
-//    int x = 0;
-//    int y = 0;
+std::pair<float,float> Game::getRandomPosition(int res_x, int res_y, int dead_zone)
+{
+    int x = 0;
+    int y = 0;
 
-//    do
-//    {
-//        x = static_cast<float>(rand() % res_x);
-//        y = static_cast<float>(rand() % res_y);
-//    }while ( (abs(x-res_x/2) > dead_zone || abs(y-res_y/2) > dead_zone) );
+    do {
+        x = static_cast<float>(rand() % res_x);
+        y = static_cast<float>(rand() % res_y);
+    } while ( (abs(x-res_x/2) > dead_zone || abs(y-res_y/2) < dead_zone) );
 
-
-
-//    return std::pair<float,float>(x,y);
-//}
+    return std::pair<float,float>(x,y);
+}
 
 
-void Game::updateEnemies()                                                           //SPAWN WROGOW
+void Game::updateEnemies()                                                           // SPAWN WROGOW
 {
     if(spawnRule == 20.0f and enemies.empty())                                     // 1 FALA
     {
         updateTimer();
         for (int i = 0; i<10; i++)
         {                                                           //getRandomPosition(500,800,100).first,getRandomPosition(500,800,100).second
-            this->enemies.push_back(new Enemy(this->textures["ENEMY1"],rand()%this->window->getSize().x/2, rand()%this->window->getSize().y/2 ,2.f,2.f,2.f,0.7,0.7,5));
+            this->enemies.push_back(new Enemy(this->textures["ENEMY1"],
+                                    rand()%this->window->getSize().x/2, rand()%this->window->getSize().y/2, //
+                                    2.f, 2.f,
+                                    2.f, 0.7,
+                                    0.7, 5));
         }
     }
 
