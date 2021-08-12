@@ -4,7 +4,7 @@
 #pragma once
 #include <iostream>
 #include<SFML/Graphics.hpp>
-
+// jakas zmiana test
 
 class Bonus
 {
