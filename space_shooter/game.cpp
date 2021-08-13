@@ -25,14 +25,17 @@ void Game::initializeTextures()
 
 void Game::initializeBackground()
 {
-    if(!this->texture_background.loadFromFile("./../space_shooter/Tekstury/tlo.jpg"))
+    if(!this->texture_background.loadFromFile("./../space_shooter/Tekstury/tlo.png"))
     {
         std::cout<<"Blad wczytywanie tekstury tla"<<std::endl;
     }
+    texture_background.setRepeated(true);
+    background.setTextureRect(sf::IntRect(0, 0, 500, 800));
     background.setTexture(texture_background);
     background.setPosition(0,0);
-    background.setOrigin(78,0);
+    background.setOrigin(0,0);
     background.setScale(1,1);
+
 }
 
 
@@ -67,7 +70,7 @@ void Game::initializePlayer()
 {
     this->player = new Player();
 
-    this->player->setPosition2(player, 250, 640);
+    this->player->setPosition2(player, 250, 640); // na sztywno
     this->player->initializeTexture();
     this->player->initializeSprite(player);
     this->HPMax = this->player->getHPMax(player);
@@ -164,7 +167,7 @@ void Game::updateInput()
     curPos.x = player->getPos(player).x;
     curPos.y = player->getPos(player).y;
 
-    //        sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
+    //sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
 
     sf::Vector2f mouse_position = window->mapPixelToCoords(sf::Mouse::getPosition(*window));    // POZYCJA MYSZY
     float dx = curPos.x - mouse_position.x;
@@ -173,9 +176,14 @@ void Game::updateInput()
     float rotation = std::atan2(dy,dx)*180.0/PI;
 
     //debuger
-    std::cout<<mouse_position.x<<"\t"<<mouse_position.y<<std::endl;
+//    std::cout<<mouse_position.x<<"\t"<<mouse_position.y<<std::endl;
 
     player->setRotation(rotation-90);
+
+//    for(auto& bull : bullets)
+//    {
+//        bull->setRotation(rotation-90);
+//    }
 
 
 //    for(auto *bull : bullets)
@@ -202,18 +210,24 @@ void Game::updateInput()
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
         player->animate(player,1.f,0.f);
     }
+
+
     if( player->canAttack(player))                                                        // NASZE POCISKI
     {
         aimDir = mouse_position - player->getPos(player);
         aimDirNorm = aimDir / static_cast<float>(sqrt(pow(aimDir.x, 2) + pow(aimDir.y, 2)));
 
 //        std::cout<<mouse_position.x<<"\t"<<mouse_position.y<<std::endl;
-        this->bullets.push_back(new Bullet(this->textures["BULLET"],
-                                player->getPos(player).x,
-                                player->getPos(player).y,
-                                aimDirNorm.x,
-                                aimDirNorm.y,
-                                10.f));
+//        for(auto *bull : bullets)
+//        {
+            this->bullets.push_back(new Bullet(textures["BULLET"],
+                                               player->getPos(player).x,
+                                               player->getPos(player).y,
+                                               aimDirNorm.x,
+                                               aimDirNorm.y,
+                                               10.f,
+                                               rotation-90));
+//        }
     }
 }
 
@@ -223,11 +237,11 @@ void Game::updateBullets()
     int counter = 0;
     for (auto *bull : bullets)
     {
-        bull->update();
+        bull->update(bull);
 //        for(auto enemy : enemies)
 //        {
             //usuwanie pociskow
-            if(bull->getBounds().top + bull->getBounds().height < 0.f) // or bull->getBounds().top + bull->getBounds().height < enemy->getBounds().height
+            if(bull->getBounds(bull).top + bull->getBounds(bull).height < 0.f) // or bull->getBounds().top + bull->getBounds().height < enemy->getBounds().height
             {
                 //usuwanie konkretnego wskaznika
                 delete this->bullets.at(counter);
@@ -238,8 +252,8 @@ void Game::updateBullets()
 
             }
 //        }
-//        std::cout<< "Liczba pociskow na ekranie: ";
-//        std::cout<< this->bullets.size() << std::endl;
+        std::cout<< "Liczba pociskow na ekranie: ";
+        std::cout<< this->bullets.size() << std::endl;
         ++counter;
     }
 }
@@ -247,15 +261,25 @@ void Game::updateBullets()
 
 void Game::updateEnemyBullets()
 {
-
     for (auto& e : enemies)                                                         // POCISKI WROGA
     {
         if( e->canAttack())
         {
             e->updateAttack();
-            for (auto& enemy : enemies)
+            for (auto& enemy : enemies)                                             // teraz strzelaja wszystkie naraz w tym samym czasie
             {
-                this->enemy_bullets.push_back(new Bullet(this->textures["BULLET2"], enemy->getPos().x,enemy->getPos().y,0.f,-10.f,-0.5f));
+//                for (auto& bull : enemy_bullets) // tu wczesniej bylo bullets ( i sie bugowalo )
+//                {
+                    this->enemy_bullets.push_back(new Bullet(textures["BULLET2"],
+                                                             enemy->getPos().x,
+                                                             enemy->getPos().y,
+                                                             0.f,
+                                                             -10.f,
+                                                             -0.5f,
+                                                             180.f));
+//                    std::cout<< "Liczba pociskow wroga na ekranie: ";
+//                    std::cout<< this->enemy_bullets.size() << std::endl;
+//                }
             }
         }
     }
@@ -263,10 +287,10 @@ void Game::updateEnemyBullets()
     int counter = 0;
     for (auto *bull : enemy_bullets)
     {
-        bull->update();
+        bull->update(bull);
 
         //usuwanie pociskow
-        if(bull->getBounds().top > window_height or player->getBounds(player).intersects(bull->getBounds()))
+        if(bull->getBounds(bull).top > window_height or player->getBounds(player).intersects(bull->getBounds(bull)))
         {
             //usuwanie konkretnego wskaznika
             delete this->enemy_bullets.at(counter);
@@ -389,7 +413,7 @@ void Game::updateCombat()                                               // KOLIZ
     {
         for(int j=0; j< static_cast<int>(this->bullets.size()); j++)
         {
-            if(this->bullets[j]->getBounds().intersects(this->enemies[i]->getBounds()))
+            if(this->bullets[j]->getBounds(bullets[j]).intersects(this->enemies[i]->getBounds()))
             {
                 enemies[i]->decreaseHP();
                 //DEBUGER
@@ -423,7 +447,7 @@ void Game::updateCombat()                                               // KOLIZ
         {
             enemies[i]->decreaseHP();
             player->decreaseHP(player,this->enemies[i]->Hit());
-                std::cout<<player->getHP(player)<<std::endl;
+//            std::cout<<player->getHP(player)<<std::endl;    //debugger ilosci hp
         }
     }
 
@@ -431,13 +455,13 @@ void Game::updateCombat()                                               // KOLIZ
     // kolizje pociskow wroga z naszym statkiem
     for (auto &e : enemies)
     {
-        for(auto &b : enemy_bullets)
+        for(auto &ebull : enemy_bullets)
         {
-            if(b->getBounds().intersects(player->getBounds(player)))
+            if(ebull->getBounds(ebull).intersects(player->getBounds(player)))
             {
                 player->decreaseHP(player, e->Hit());
-                //DEBUGER
-                std::cout<< this->player->getHP(player) << std::endl;
+                //DEBUGGER ilosci HP
+//                std::cout<< this->player->getHP(player) << std::endl;
             }
         }
     }
@@ -461,11 +485,7 @@ void Game::updateCombat()                                               // KOLIZ
 void Game::updateGUI()
 {
     std::stringstream ss;
-    std::stringstream ss2;
-
-    ss << player->getHP(player);
-    ss << "/";
-    ss << HPMax;
+    ss << player->getHP(player) << "/" << HPMax;
     this->myText.setString(ss.str());
 }
 
@@ -507,7 +527,7 @@ void Game::render()
 
     for (auto *bull : bullets)
     {
-        bull->render(this->window);
+        bull->render(bull,window);
     }
     for (auto *bon : bonuses)
     {
@@ -515,7 +535,7 @@ void Game::render()
     }
     for (auto *bull : enemy_bullets)
     {
-        bull->render(this->window);
+        bull->render(bull,window);
     }
     for (auto *enemy : enemies)
     {
@@ -523,7 +543,7 @@ void Game::render()
     }
     this->renderGUI();
 
-    //gave over text
+    //game over text
     if(player->getHP(player) <=0)
     {
         this->window->draw(this->GameOver_text);

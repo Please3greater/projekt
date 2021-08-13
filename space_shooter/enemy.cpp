@@ -77,7 +77,7 @@ int Enemy::Hit()
     return damage;
 }
 
-
+// zmienianie kierunku ruchu statku wroga
 void Enemy::update()
 {
         sf::FloatRect rectangle_bounds = this->shape.getGlobalBounds();

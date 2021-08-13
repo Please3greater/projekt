@@ -37,6 +37,7 @@ private:
     //Textury
     std::map<std::string, sf::Texture*> textures;
 
+    //wektory obiektow
     std::vector<Bullet*> bullets;            // nasze pociski
     std::vector<Bullet*> enemy_bullets;     // pociski wroga
     std::vector<Enemy*> enemies;           // wrogowie
@@ -63,23 +64,25 @@ public:
     Game();
     virtual ~Game();
 
-   //funkcje publiczne
-   std::pair<float,float> getRandomPosition(int res_x, int res_y, int dead_zone);
-   void run();
-   void updateEvents();
-   void updateInput();
-   void updateGUI();
-   void updateBullets();
-   void updateEnemyBullets();
-   void updateBonuses();
-   void updateTimer();
-   bool canAttack();
-   void updateEnemies();
-   void updateCombat();
-   void update();
-   void renderGUI();
-   void renderBackground();
-   void render();
+    //funkcje publiczne
+    bool canAttack();
+    std::pair<float,float> getRandomPosition(int res_x, int res_y, int dead_zone);
+    void run();
+
+    void updateEvents();
+    void updateInput();
+    void updateGUI();
+    void updateBullets();
+    void updateEnemyBullets();
+    void updateBonuses();
+    void updateTimer();
+    void updateEnemies();
+    void updateCombat();
+    void update();
+
+    void renderGUI();
+    void renderBackground();
+    void render();
 };
 
 #endif // GAME_H
