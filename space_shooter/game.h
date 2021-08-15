@@ -6,6 +6,7 @@
 #include "bullet.h"
 #include "enemy.h"
 #include "bonus.h"
+#include "boss.h"
 #include <map>
 #include <string>
 #include <sstream>
@@ -66,7 +67,8 @@ public:
 
     //funkcje publiczne
     bool canAttack();
-    std::pair<float,float> getRandomPosition(int res_x, int res_y, int dead_zone);
+    int Hit(int howMany);
+    std::pair<int,int> getRandomPosition(int res_x, int res_y);
     void run();
 
     void updateEvents();

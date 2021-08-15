@@ -11,13 +11,13 @@ void Player::initializeTexture()
 }
 
 
-void Player::initializeSprite(Player *sprite)
+void Player::initializeSprite()
 {
     //wczytywanie tekstur do spritow
-    sprite->setTexture(this->texture);
-    sprite->scale(0.5f,0.5f);
+    setTexture(texture);
+    scale(0.5f,0.5f);
 //    sprite->setPosition(250,640);
-    sprite->setOrigin(112.0/2.0,75.0/2.0);
+    setOrigin(112.0/2.0,75.0/2.0); // na sztywno
 }
 
 //KONSTRUKTOR I DESTRUKTOR
@@ -39,38 +39,38 @@ Player::~Player()
 
 
 // FUNKCJE PUBLICZNE
-const sf::Vector2f &Player::getPos(Player *sprite) const
+const sf::Vector2f &Player::getPos() const
 {
-    return sprite->getPosition();
+    return getPosition();
 }
 
-const sf::FloatRect Player::getBounds(Player *sprite) const
+const sf::FloatRect Player::getBounds() const
 {
-    return sprite->getGlobalBounds();
+    return getGlobalBounds();
 }
 
-void Player::setPosition2(Player *sprite, const float x, const float y)
+void Player::setPosition2(const float x, const float y)
 {
-    sprite->setPosition(x,y);
+    setPosition(x,y);
 }
 
-int Player::getHP(Player *sprite)
+int Player::getHP()
 {
-    return sprite->HP;
+    return HP;
 }
-int Player::getHPMax(Player *sprite)
+int Player::getHPMax()
 {
-    return sprite->HPMax;
-}
-
-void Player::decreaseHP(Player *sprite, int damage)
-{
-    sprite->HP -= damage;
+    return HPMax;
 }
 
-void Player::increaseHP(Player *sprite, int damage)
+void Player::decreaseHP(int damage)
 {
-    sprite->HP = HP + damage;
+    HP -= damage;
+}
+
+void Player::increaseHP(int damage)
+{
+    HP = HP + damage;
 }
 
 //int Player::Hit(Player *sprite)
@@ -80,36 +80,36 @@ void Player::increaseHP(Player *sprite, int damage)
 
 
 //animacje z kolizje ze scianami
-void Player::animate(Player *sprite, const float dirX, const float dirY)
+void Player::animate(const float dirX, const float dirY)
 {
 //    this->sprite.move(this->movementSpeed * dirX, this->movementSpeed * dirY);
-    sf::FloatRect sprite_bounds = sprite->getGlobalBounds();
+    sf::FloatRect sprite_bounds = getGlobalBounds();
 
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::W) and sprite->getGlobalBounds().top > 0) // wartosci stale
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::W) and getGlobalBounds().top > 0) // wartosci stale
     {
-        sprite->move(0,this->movementSpeed * dirY);
+        move(0,this->movementSpeed * dirY);
     }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::S) and sprite_bounds.top+sprite_bounds.height < 800) // dopoki prawda jest ze wysokosc okna < niz ustawiona
     {
-        sprite->move(0,this->movementSpeed * dirY);
+        move(0,this->movementSpeed * dirY);
     }
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::A) and sprite->getGlobalBounds().left > 0)
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::A) and getGlobalBounds().left > 0)
     {
-        sprite->move(this->movementSpeed * dirX,0);
+        move(this->movementSpeed * dirX,0);
     }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::D) and sprite_bounds.left+sprite_bounds.width < 500)
     {
-        sprite->move(this->movementSpeed * dirX,0);
+        move(this->movementSpeed * dirX,0);
     }
 
 }
 
 //licznik do inicjalizacji wyrzutu pocisku
-bool Player::canAttack(Player* player)
+bool Player::canAttack()
 {
-    if(player->attackCooldown >= player->attackCooldownMax)
+    if(attackCooldown >= attackCooldownMax)
     {
-        player->attackCooldown = 0.f;
+        attackCooldown = 0.f;
         return true;
     }
     return false;
@@ -123,9 +123,9 @@ void Player::updateAttack()
     }
 }
 
-void Player::update(Player* player)
+void Player::update()
 {
-    player->updateAttack();
+    updateAttack();
 }
 
 void Player::render(Player* player, sf::RenderTarget &target)

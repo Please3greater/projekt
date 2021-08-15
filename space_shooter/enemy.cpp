@@ -10,11 +10,11 @@ Enemy::Enemy()
 
 sf::FloatRect Enemy::getBounds() // tu musi byc kopia bo bedzie sie bugowac (pamiec dynamiczna)
 {
-    return this->shape.getGlobalBounds();
+    return getGlobalBounds();
 }
 const sf::Vector2f &Enemy::getPos() const
 {
-    return this->shape.getPosition();
+    return getPosition();
 }
 
 bool Enemy::canAttack()
@@ -45,14 +45,14 @@ Enemy::Enemy(sf::Texture *texture, float posX, float posY, float dirX, float dir
          attackCooldown(attackCooldownMax)
 {
 //    posX = getRandomPosition(500,800).first;
-    this->shape.setTexture(*texture);
+    setTexture(*texture);
 
-    this->shape.setPosition(posX,posY);
-    this->shape.scale(scaleX,scaleY);
+    setPosition(posX,posY);
+    scale(scaleX,scaleY);
     this->direction.x = dirX;
     this->direction.y = dirY;
     this->movementSpeed = movement_speed;
-    this->shape.setOrigin(93/2,84/2);
+    setOrigin(93/2,84/2);
     this->HP = hp;
 }
 
@@ -80,7 +80,7 @@ int Enemy::Hit()
 // zmienianie kierunku ruchu statku wroga
 void Enemy::update()
 {
-        sf::FloatRect rectangle_bounds = this->shape.getGlobalBounds();
+        sf::FloatRect rectangle_bounds = getGlobalBounds();
 
         if(rectangle_bounds.top+rectangle_bounds.height > 400) // wartosci stale
         {
@@ -98,10 +98,10 @@ void Enemy::update()
         {
             direction.x = -(direction.x);
         }
-        this->shape.move(this->movementSpeed * this->direction);
+        move(this->movementSpeed * this->direction);
 }
 
-void Enemy::render(sf::RenderTarget *target)
+void Enemy::render(Enemy *sprite, sf::RenderTarget *target)
 {
-    target->draw(this->shape);
+    target->draw(*sprite);
 }

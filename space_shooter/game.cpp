@@ -3,7 +3,7 @@
 //funkcje prywatne
 void Game::initializeWindow()
 {
-    this->window = new sf::RenderWindow(sf::VideoMode(500,800), "Galaxy shooter");
+    this->window = new sf::RenderWindow(sf::VideoMode(window_width,window_height), "Galaxy shooter");
     this->window->setFramerateLimit(60);
 }
 
@@ -21,6 +21,8 @@ void Game::initializeTextures()
     this->textures["ENEMY3"]->loadFromFile("./../space_shooter/Tekstury/enemy3.png");
     this->textures["BONUS1"] = new sf::Texture();
     this->textures["BONUS1"]->loadFromFile("./../space_shooter/Tekstury/bonus1.png");
+//    this->textures["SHIELD"] = new sf::Texture();
+//    this->textures["SHIELD"]->loadFromFile("./../space_shooter/Tekstury/shield1.png");
 }
 
 void Game::initializeBackground()
@@ -30,12 +32,11 @@ void Game::initializeBackground()
         std::cout<<"Blad wczytywanie tekstury tla"<<std::endl;
     }
     texture_background.setRepeated(true);
-    background.setTextureRect(sf::IntRect(0, 0, 500, 800));
+    background.setTextureRect(sf::IntRect(0, 0, window_width, window_height));
     background.setTexture(texture_background);
     background.setPosition(0,0);
     background.setOrigin(0,0);
     background.setScale(1,1);
-
 }
 
 
@@ -70,10 +71,10 @@ void Game::initializePlayer()
 {
     this->player = new Player();
 
-    this->player->setPosition2(player, 250, 640); // na sztywno
+    this->player->setPosition2(window_width/2, 0.8*window_height); // na sztywno
     this->player->initializeTexture();
-    this->player->initializeSprite(player);
-    this->HPMax = this->player->getHPMax(player);
+    this->player->initializeSprite();
+    this->HPMax = this->player->getHPMax();
 }
 
 void Game::initializeEnemies()
@@ -140,7 +141,7 @@ void Game::run()
     while(this->window->isOpen())
     {
         this->updateEvents();
-        if(player->getHP(player) >0)
+        if(player->getHP() >0)
         {
             this->update();
         }
@@ -164,8 +165,8 @@ void Game::updateEvents()
 void Game::updateInput()
 {                                                                                                // FACE TO MOUSE
     sf::Vector2f curPos;                                                                        // POZYCJA OBIEKTU
-    curPos.x = player->getPos(player).x;
-    curPos.y = player->getPos(player).y;
+    curPos.x = player->getPos().x;
+    curPos.y = player->getPos().y;
 
     //sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
 
@@ -199,30 +200,30 @@ void Game::updateInput()
 
     // Ruszanie sie naszego statku                                                      // OBSLUGA KLAWISZY   ( RUCH )
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        player->animate(player,0.f,-1.f);
+        player->animate(0.f,-1.f);
     }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        player->animate(player,0.f,1.f);
+        player->animate(0.f,1.f);
     }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-        player->animate(player,-1.f,0.f);
+        player->animate(-1.f,0.f);
     }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-        player->animate(player,1.f,0.f);
+        player->animate(1.f,0.f);
     }
 
 
-    if( player->canAttack(player))                                                        // NASZE POCISKI
+    if( player->canAttack())                                                        // NASZE POCISKI
     {
-        aimDir = mouse_position - player->getPos(player);
+        aimDir = mouse_position - player->getPos();                                 // kierunek w ktorym maja leciec nasze pociski ( do kursora )
         aimDirNorm = aimDir / static_cast<float>(sqrt(pow(aimDir.x, 2) + pow(aimDir.y, 2)));
 
 //        std::cout<<mouse_position.x<<"\t"<<mouse_position.y<<std::endl;
 //        for(auto *bull : bullets)
 //        {
             this->bullets.push_back(new Bullet(textures["BULLET"],
-                                               player->getPos(player).x,
-                                               player->getPos(player).y,
+                                               player->getPos().x,
+                                               player->getPos().y,
                                                aimDirNorm.x,
                                                aimDirNorm.y,
                                                10.f,
@@ -237,11 +238,14 @@ void Game::updateBullets()
     int counter = 0;
     for (auto *bull : bullets)
     {
-        bull->update(bull);
+        bull->update();
 //        for(auto enemy : enemies)
 //        {
-            //usuwanie pociskow
-            if(bull->getBounds(bull).top + bull->getBounds(bull).height < 0.f) // or bull->getBounds().top + bull->getBounds().height < enemy->getBounds().height
+            //usuwanie pociskow                                                                             ( na sztywno )
+            if(bull->getBounds().top + bull->getBounds().height < window_height - window_height     or
+               bull->getBounds().top + bull->getBounds().height > window_height                     or
+               bull->getBounds().width + bull->getBounds().left > window_width                      or
+               bull->getBounds().width + bull->getBounds().left < window_width-window_width         )
             {
                 //usuwanie konkretnego wskaznika
                 delete this->bullets.at(counter);
@@ -252,57 +256,55 @@ void Game::updateBullets()
 
             }
 //        }
-        std::cout<< "Liczba pociskow na ekranie: ";
-        std::cout<< this->bullets.size() << std::endl;
+//        std::cout<< "Liczba pociskow na ekranie: ";
+//        std::cout<< this->bullets.size() << std::endl;
         ++counter;
     }
 }
 
+void Game::updateEnemyBullets() // ( and enemies )
+{                                                                                       //OBRACANIE SIE WROGOW DO NAS
+    sf::Vector2f ourCurPos;                                         // nasza pozycja
+    ourCurPos.x = player->getPos().x;
+    ourCurPos.y = player->getPos().y;
 
-void Game::updateEnemyBullets()
-{
-    for (auto& e : enemies)                                                         // POCISKI WROGA
+
+
+    for (auto& e : enemies)                                                             // POCISKI WROGA
     {
-        if( e->canAttack())
+        sf::Vector2f enemyCurPos;                                   // pozycja wroga
+        enemyCurPos.x = e->getPos().x;
+        enemyCurPos.y = e->getPos().y;
+
+        float dx = ourCurPos.x - enemyCurPos.x;
+        float dy = ourCurPos.y - enemyCurPos.y;
+        const float PI = 3.14159265;
+        float rotation = std::atan2(dy,dx)*180.0/PI;
+
+        e->setRotation(rotation-90);
+
+        aimDir = e->getPos() - player->getPos();                                 // kierunek w ktorym maja leciec pociski wroga ( do nas )
+        aimDirNorm = aimDir / static_cast<float>(sqrt(pow(aimDir.x, 2) + pow(aimDir.y, 2)));
+
+        if( e->canAttack())                                                         // teraz strzelaja wszystkie naraz w tym samym czasie
         {
-            e->updateAttack();
-            for (auto& enemy : enemies)                                             // teraz strzelaja wszystkie naraz w tym samym czasie
-            {
-//                for (auto& bull : enemy_bullets) // tu wczesniej bylo bullets ( i sie bugowalo )
-//                {
-                    this->enemy_bullets.push_back(new Bullet(textures["BULLET2"],
-                                                             enemy->getPos().x,
-                                                             enemy->getPos().y,
-                                                             0.f,
-                                                             -10.f,
-                                                             -0.5f,
-                                                             180.f));
-//                    std::cout<< "Liczba pociskow wroga na ekranie: ";
-//                    std::cout<< this->enemy_bullets.size() << std::endl;
-//                }
-            }
+            e->updateAttack();                                                      // dodanie do wektora
+
+            this->enemy_bullets.push_back(new Bullet(textures["BULLET2"],
+                                                     e->getPos().x,
+                                                     e->getPos().y,
+                                                     aimDirNorm.x, //0.f
+                                                     aimDirNorm.y,//-10.f
+                                                     -10.f,//-0.5f
+                                                     rotation-270)); //static_cast<float>(setRotation(rotation-90))  bulletRotation()
+            std::cout<< "Liczba pociskow wroga na ekranie: ";
+            std::cout<< this->enemy_bullets.size() << std::endl;
         }
     }
 
-    int counter = 0;
-    for (auto *bull : enemy_bullets)
+    for (auto *bull : enemy_bullets)                                                // ruch
     {
-        bull->update(bull);
-
-        //usuwanie pociskow
-        if(bull->getBounds(bull).top > window_height or player->getBounds(player).intersects(bull->getBounds(bull)))
-        {
-            //usuwanie konkretnego wskaznika
-            delete this->enemy_bullets.at(counter);
-            //usuwanie go z wektora
-            this->enemy_bullets.erase(this->enemy_bullets.begin()+counter);
-            --counter;
-
-
-        }
-//        std::cout<< "Liczba pociskow na ekranie: ";
-//        std::cout<< this->bullets.size() << std::endl;
-        ++counter;
+        bull->update();
     }
 }
 
@@ -322,9 +324,9 @@ void Game::updateBonuses()
             this->bonuses.erase(this->bonuses.begin()+counter);
             --counter;
         }
-        if( player->getBounds(player).intersects( bon->getBounds() ) )
+        if( player->getBounds().intersects( bon->getBounds() ) )
         {
-            player->increaseHP(player,bon->heal());
+            player->increaseHP(bon->heal(bon->setHeal(player->getHPMax()/10)));
             delete this->bonuses.at(counter);
 
             this->bonuses.erase(this->bonuses.begin()+counter);
@@ -338,18 +340,23 @@ void Game::updateTimer()
     spawnRule++;
 }
 
-std::pair<float,float> Game::getRandomPosition(int res_x, int res_y, int dead_zone)
-{
-    int x = 0;
-    int y = 0;
+//std::pair<int,int> Game::getRandomPosition(int res_x, int res_y)         // spawn w prostokacie ( antybug na blokowanie sie
+//{                                                                                       // przeciwnikow na krawedzi okienka aplikacji )
+//    int x = rand()%window_width;
+//    int y = rand()%window_height/2;
+//    int l_border = res_x/5;
+//    int r_border = 4*res_x/5;
+//    int t_border = res_y/8;
+//    int b_border = 3*res_y/5;
 
-    do {
-        x = static_cast<float>(rand() % res_x);
-        y = static_cast<float>(rand() % res_y);
-    } while ( (abs(x-res_x/2) > dead_zone || abs(y-res_y/2) < dead_zone) );
-
-    return std::pair<float,float>(x,y);
-}
+//    do
+//    {
+//        int x = rand()%window_width;
+//        int y = rand()%window_height/2;
+//        return std::pair<int,int>(x,y);
+//    }
+//    while( (x > l_border and x < r_border and y > t_border and y < b_border) );
+//}
 
 
 void Game::updateEnemies()                                                           // SPAWN WROGOW
@@ -358,9 +365,9 @@ void Game::updateEnemies()                                                      
     {
         updateTimer();
         for (int i = 0; i<10; i++)
-        {                                                           //getRandomPosition(500,800,100).first,getRandomPosition(500,800,100).second
+        {                   //getRandomPosition(window_width,window_height).first,getRandomPosition(window_width,window_height).second
             this->enemies.push_back(new Enemy(this->textures["ENEMY1"],
-                                    rand()%this->window->getSize().x/2, rand()%this->window->getSize().y/2, //
+                                    rand()%this->window->getSize().x, rand()%this->window->getSize().y/2,
                                     2.f, 2.f,
                                     2.f, 0.7,
                                     0.7, 5));
@@ -372,7 +379,11 @@ void Game::updateEnemies()                                                      
         updateTimer();
         for (int i = 0; i<7; i++)
         {
-            this->enemies.push_back(new Enemy(this->textures["ENEMY2"], rand()%this->window->getSize().x/2,rand()%this->window->getSize().y/2,2.f,2.f,1.2f,1.0,1.0,10));
+            this->enemies.push_back(new Enemy(this->textures["ENEMY2"],
+                                    rand()%this->window->getSize().x, rand()%this->window->getSize().y/2,
+                                    2.f,2.f,
+                                    1.2f,1.0,
+                                    1.0,10));
         }
     }
 
@@ -381,7 +392,11 @@ void Game::updateEnemies()                                                      
         updateTimer();
         for (int i = 0; i<5; i++)
         {
-            this->enemies.push_back(new Enemy(this->textures["ENEMY3"], rand()%this->window->getSize().x/2,rand()%this->window->getSize().y/2,2.f,2.f,0.7f,1.2,1.2,20));
+            this->enemies.push_back(new Enemy(this->textures["ENEMY3"],
+                                    rand()%this->window->getSize().x, rand()%this->window->getSize().y/2,
+                                    2.f,2.f,
+                                    0.7f,1.2,
+                                    1.2,20));
         }
     }
     if(spawnRule == 23.f and enemies.empty())                                      // BOSS tu trzeba stworzc calkiem nowy, osobny obiekt
@@ -389,14 +404,17 @@ void Game::updateEnemies()                                                      
         updateTimer();
         for (int i = 0; i<1; i++)
         {
-            this->enemies.push_back(new Enemy(this->textures["ENEMY3"], rand()%this->window->getSize().x/2,rand()%this->window->getSize().y/2,2.f,2.f,0.5f,2.0,2.0,50));
+            this->enemies.push_back(new Enemy(this->textures["ENEMY3"],
+                                    rand()%this->window->getSize().x, rand()%this->window->getSize().y/2,
+                                    2.f,2.f,
+                                    0.5f,2.0,
+                                    2.0,50));
         }
     }
 //    else
 //    {
 
 //    }
-
 
 
     for (auto *enemy : enemies)                // RUCH WROGOW
@@ -406,6 +424,11 @@ void Game::updateEnemies()                                                      
     }
 }
 
+int Game::Hit(int howMany)
+{
+    return howMany;
+}
+
 void Game::updateCombat()                                               // KOLIZJE WALKA
 {
     // kolizje naszych pociskow ze statkami wroga
@@ -413,19 +436,20 @@ void Game::updateCombat()                                               // KOLIZ
     {
         for(int j=0; j< static_cast<int>(this->bullets.size()); j++)
         {
-            if(this->bullets[j]->getBounds(bullets[j]).intersects(this->enemies[i]->getBounds()))
+            if(this->bullets[j]->getBounds().intersects(this->enemies[i]->getBounds()))
             {
                 enemies[i]->decreaseHP();
                 //DEBUGER
 //                std::cout<< "HP wroga: " << std::endl;
 //                std::cout<< this->enemies[i]->getHP() << std::endl;
                this->bullets.erase(this->bullets.begin() +j);           // POCISK MUSI USUWAC SIE PRZY ZDERZENIU Z WROGIEM, ZEBY ODJAC MU TYLKO 1 HP
-                if (enemies[i]->getHP() <= 0)
+
+                if (enemies[i]->getHP() <= 0)                           // likwidacja wroga ( tu dodac animacje )
                 {
                     //usuwanie obiektu z wektora
                     this->enemies.erase(this->enemies.begin() +i);
 
-                    if (rand()%10 < 3) // szansa na wypadniecie tego konretnego bonusu
+                    if (rand()%10 < 2) // szansa na wypadniecie tego konretnego bonusu
                     {
                         this->bonuses.push_back(new Bonus(this->textures["BONUS1"],
                                                 enemies[i]->getPos().x,//50
@@ -434,6 +458,15 @@ void Game::updateCombat()                                               // KOLIZ
                                                 10.f,
                                                 1.0f));
                     }
+//                    else
+//                    {
+//                        this->bonuses.push_back(new Bonus(this->textures["BONUS2"],
+//                                                enemies[i]->getPos().x,//50
+//                                                enemies[i]->getPos().y, //100
+//                                                0.f,
+//                                                10.f,
+//                                                1.0f));
+//                    }
                 }
             }
             // debugowanie
@@ -443,40 +476,46 @@ void Game::updateCombat()                                               // KOLIZ
 
 
         //kolizje naszego statku ze statkami wroga
-        if (player->getBounds(player).intersects(enemies[i]->getBounds()))
+        if (player->getBounds().intersects(enemies[i]->getBounds()))
         {
             enemies[i]->decreaseHP();
-            player->decreaseHP(player,this->enemies[i]->Hit());
+            player->decreaseHP(this->enemies[i]->Hit());
 //            std::cout<<player->getHP(player)<<std::endl;    //debugger ilosci hp
         }
     }
 
 
-    // kolizje pociskow wroga z naszym statkiem
-    for (auto &e : enemies)
+    // kolizje pociskow wroga z naszym statkiem // usuwanie pociskow wroga
+    int counter = 0;
+    for (auto *bull : enemy_bullets)
     {
-        for(auto &ebull : enemy_bullets)
+        if(bull->getBounds().top > window_height)                       // pocisk poza ekranem aplikacji
         {
-            if(ebull->getBounds(ebull).intersects(player->getBounds(player)))
-            {
-                player->decreaseHP(player, e->Hit());
-                //DEBUGGER ilosci HP
-//                std::cout<< this->player->getHP(player) << std::endl;
-            }
+            //usuwanie konkretnego wskaznika
+            delete this->enemy_bullets.at(counter);
+            //usuwanie go z wektora
+            this->enemy_bullets.erase(this->enemy_bullets.begin()+counter);
+            --counter;
         }
-    }
-//    for (int i = 0; i < static_cast<int>(this->enemies.size()); i++)
-//    {
-//        for(int j=0; j< static_cast<int>(this->enemy_bullets.size()) ; j++)
-//        {
-//            if(this->enemy_bullets[j]->getBounds().intersects(this->player->getBounds()))
-//            {
-//                player->decreaseHP(enemies[i]->Hit());
-//                //DEBUGER
-////                std::cout<< this->enemies[i]->getHP() << std::endl;
+        if(bull->getBounds().intersects(player->getBounds()))     // pocisk przy zderzeniu z naszym statkiem
+        {
+//            for(auto& enemy:enemies)
+//            {                                                 // napisanie for enemy : enemies nie dziala, bo cos wykracza poza skale
+                player->decreaseHP(Hit(1));//enemy->Hit()       // tu by sie przydalo zlinkowac jakos hit() obiektu enemy
+                delete this->enemy_bullets.at(counter);
+                //usuwanie go z wektora
+                this->enemy_bullets.erase(this->enemy_bullets.begin()+counter);
+                --counter;
 //            }
-//        }
-//    }
+        }
+
+//        std::cout<< "Liczba pociskow na ekranie: ";
+//        std::cout<< this->bullets.size() << std::endl;
+        std::cout<< "Liczba pociskow wroga na ekranie: ";
+        std::cout<< this->enemy_bullets.size() << std::endl;
+        ++counter;
+    }
+
 
 }
 
@@ -485,7 +524,7 @@ void Game::updateCombat()                                               // KOLIZ
 void Game::updateGUI()
 {
     std::stringstream ss;
-    ss << player->getHP(player) << "/" << HPMax;
+    ss << player->getHP() << "/" << HPMax;
     this->myText.setString(ss.str());
 }
 
@@ -493,7 +532,7 @@ void Game::update()
 {
 //    this->updateEvents();
     this->updateInput();
-    this->player->update(player);
+    this->player->update();
     this->updateBullets();
     this->updateEnemyBullets();
     this->updateEnemies();
@@ -539,12 +578,12 @@ void Game::render()
     }
     for (auto *enemy : enemies)
     {
-        enemy->render(this->window);
+        enemy->render(enemy,window);
     }
     this->renderGUI();
 
     //game over text
-    if(player->getHP(player) <=0)
+    if(player->getHP() <=0)
     {
         this->window->draw(this->GameOver_text);
     }

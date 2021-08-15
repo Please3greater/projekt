@@ -4,7 +4,6 @@
 #pragma once
 #include <iostream>
 #include<SFML/Graphics.hpp>
-// jakas zmiana test
 
 class Bonus
 {
@@ -22,7 +21,8 @@ public:
     // krawedzie grafiki
     const sf::FloatRect getBounds() const;
     //uzdrawianie
-    int heal();
+    int heal(int heal_);
+    int setHeal(int howMany);
 
     void update();
     void render(sf::RenderTarget *target);

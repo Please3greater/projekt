@@ -5,6 +5,7 @@ CONFIG -= qt
 
 SOURCES += \
         bonus.cpp \
+        boss.cpp \
         bullet.cpp \
         enemy.cpp \
         game.cpp \
@@ -21,6 +22,7 @@ CONFIG(debug, debug|release){
 
 HEADERS += \
     bonus.h \
+    boss.h \
     bullet.h \
     enemy.h \
     game.h \

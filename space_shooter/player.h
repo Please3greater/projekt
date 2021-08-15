@@ -14,7 +14,7 @@ private:
     float attackCooldownMax;
     float attackCooldown;
 
-    const int HPMax = 1000;
+    const int HPMax = 100;
     int HP;
 
     int damage;
@@ -26,27 +26,27 @@ public:
     virtual ~Player();
 
     //getter do pozycji gracza dla pocisku
-    const sf::Vector2f &getPos(Player *sprite) const;
-    const sf::FloatRect getBounds(Player *sprite) const;
+    const sf::Vector2f &getPos() const;
+    const sf::FloatRect getBounds() const;
 
 //    void setPosition(const sf::Vector2f pos);
-    void setPosition2(Player *sprite, const float x, const float y);
+    void setPosition2(const float x, const float y);
 
     //funkcje
-    void animate(Player *sprite, const float dirX, const float dirY);
-    int getHP(Player *sprite) ;
-    int getHPMax(Player *sprite);
-    void decreaseHP(Player *sprite, int damage);
-    void increaseHP(Player *sprite, int damage);
+    void animate(const float dirX, const float dirY);
+    int getHP() ;
+    int getHPMax();
+    void decreaseHP(int damage);
+    void increaseHP(int damage);
 //    int Hit(Player *sprite);
-    bool canAttack(Player* player);
+    bool canAttack();
     void updateAttack();
-    void update(Player* player);
+    void update();
     void render(Player* player, sf::RenderTarget &target);
 
     // funckje prywatne
     void initializeTexture();
-    void initializeSprite(Player *sprite);
+    void initializeSprite();
 };
 
 #endif // PLAYER_H

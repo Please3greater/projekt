@@ -3,10 +3,10 @@
 
 
 
-class Enemy
+class Enemy : public sf::Sprite
 {
 private:
-    sf::Sprite shape;
+//    sf::Sprite shape;
 
     sf::Vector2f direction;
     float movementSpeed;
@@ -34,5 +34,5 @@ public:
     bool canAttack();
     void updateAttack();
     void update();
-    void render(sf::RenderTarget *target);
+    void render(Enemy *sprite, sf::RenderTarget *target);
 };

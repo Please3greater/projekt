@@ -1,21 +1,22 @@
-#include "bullet.h"
+#include "boss.h"
 
-Bullet::Bullet()
+
+Boss::Boss()
 {
 
 }
 
-const sf::FloatRect Bullet::getBounds() const
+const sf::FloatRect Boss::getBounds() const
 {
     return getGlobalBounds();
 }
 
-const sf::Vector2f &Bullet::getPos() const
+const sf::Vector2f &Boss::getPos() const
 {
     return getPosition();
 }
 
-Bullet::Bullet(sf::Texture *texture, float posX, float posY, float dirX, float dirY, float movement_speed, float rotation)
+Boss::Boss(sf::Texture *texture, float posX, float posY, float dirX, float dirY, float movement_speed, float rotation)
 {
     // jesli obiekty klasy Bullet dziedzicza po sf::Sprite, to zeby wywolac jakas metode klasy Bullet nie potrzeba nam odwolywac sie do obiektow
     // klasy Bullet w sposob sprite.funkcja(), tylko wystarczy sama funkcja()
@@ -29,17 +30,18 @@ Bullet::Bullet(sf::Texture *texture, float posX, float posY, float dirX, float d
     setRotation(rotation);
 }
 
-Bullet::~Bullet()
+Boss::~Boss()
 {
 
 }
 
-void Bullet::update()//, float rotation
+void Boss::update()//, float rotation
 {
     move(this->movementSpeed * this->direction);
 }
 
-void Bullet::render(Bullet* sprite, sf::RenderTarget *target)
+void Boss::render(Boss* sprite, sf::RenderTarget *target)
 {
     target->draw(*sprite);
 }
+

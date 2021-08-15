@@ -19,11 +19,11 @@ public:
     virtual ~Bullet();
 
     // krawedzie pocisku
-    const sf::FloatRect getBounds(Bullet *sprite) const;
-    const sf::Vector2f &getPos(Bullet *sprite) const;
+    const sf::FloatRect getBounds() const;
+    const sf::Vector2f &getPos() const;
 
     void updateAttack();
-    void update(Bullet *sprite); //, float rotation
+    void update();
     void render(Bullet *sprite, sf::RenderTarget *target);
 };
 

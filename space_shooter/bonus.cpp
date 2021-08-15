@@ -12,7 +12,6 @@ const sf::FloatRect Bonus::getBounds() const
 }
 
 Bonus::Bonus(sf::Texture *texture, float posX, float posY, float dirX, float dirY, float movement_speed)
-    :   heal_(100)
 {
     this->shape.setTexture(*texture);
     this->shape.setScale(0.3,0.3);
@@ -29,10 +28,16 @@ Bonus::~Bonus()
 
 }
 
-int Bonus::heal()
+int Bonus::setHeal(int howMany)
+{
+    return howMany;
+}
+
+int Bonus::heal(int heal_)
 {
     return heal_;
 }
+
 void Bonus::update()
 {
     this->shape.move(this->movementSpeed * this->direction);
