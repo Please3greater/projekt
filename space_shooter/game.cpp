@@ -9,20 +9,22 @@ void Game::initializeWindow()
 
 void Game::initializeTextures()
 {
-    this->textures["BULLET"] = new sf::Texture();
+    this->textures["BULLET"] = new sf::Texture();                                       // nasz pocisk
     this->textures["BULLET"]->loadFromFile("./../space_shooter/Tekstury/pocisk1.png");
-    this->textures["BULLET2"] = new sf::Texture();
+    this->textures["BULLET2"] = new sf::Texture();                                      // pocisk wroga
     this->textures["BULLET2"]->loadFromFile("./../space_shooter/Tekstury/pocisk2.png");
-    this->textures["ENEMY1"] = new sf::Texture();
+    this->textures["ENEMY1"] = new sf::Texture();                                       // wrog 1
     this->textures["ENEMY1"]->loadFromFile("./../space_shooter/Tekstury/enemy1.png");
-    this->textures["ENEMY2"] = new sf::Texture();
+    this->textures["ENEMY2"] = new sf::Texture();                                       // wrog 2
     this->textures["ENEMY2"]->loadFromFile("./../space_shooter/Tekstury/enemy2.png");
-    this->textures["ENEMY3"] = new sf::Texture();
+    this->textures["ENEMY3"] = new sf::Texture();                                       // wrog 3
     this->textures["ENEMY3"]->loadFromFile("./../space_shooter/Tekstury/enemy3.png");
-    this->textures["BONUS1"] = new sf::Texture();
+    this->textures["BONUS1"] = new sf::Texture();                                       // apteczka
     this->textures["BONUS1"]->loadFromFile("./../space_shooter/Tekstury/bonus1.png");
-//    this->textures["SHIELD"] = new sf::Texture();
-//    this->textures["SHIELD"]->loadFromFile("./../space_shooter/Tekstury/shield1.png");
+    this->textures["BONUS2"] = new sf::Texture();                                       // tarcza
+    this->textures["BONUS2"]->loadFromFile("./../space_shooter/Tekstury/bonus2.png");
+    this->textures["BONUS3"] = new sf::Texture();                                       // szybsze pociski
+    this->textures["BONUS3"]->loadFromFile("./../space_shooter/Tekstury/bonus3.png");
 }
 
 void Game::initializeBackground()
@@ -38,7 +40,6 @@ void Game::initializeBackground()
     background.setOrigin(0,0);
     background.setScale(1,1);
 }
-
 
 void Game::initializeGUI()
 {
@@ -119,6 +120,14 @@ Game::~Game()
     {
         delete bon;
     }
+    for (auto &bon2 : bonuses2)
+    {
+        delete bon2;
+    }
+    for (auto &bon3 : bonuses3)
+    {
+        delete bon3;
+    }
 
     //usuwanie wrogow
     for (auto &enemy : enemies)
@@ -140,6 +149,13 @@ void Game::run()
 {
     while(this->window->isOpen())
     {
+        sf::Time elapsed = clock.restart();
+        int licznik_czasu = 0;
+        licznik_czasu += elapsed.asMilliseconds();
+        int czas = elapsed.asMilliseconds();
+
+        updateBonuses2(czas,licznik_czasu);
+
         this->updateEvents();
         if(player->getHP() >0)
         {
@@ -297,8 +313,8 @@ void Game::updateEnemyBullets() // ( and enemies )
                                                      aimDirNorm.y,//-10.f
                                                      -10.f,//-0.5f
                                                      rotation-270)); //static_cast<float>(setRotation(rotation-90))  bulletRotation()
-            std::cout<< "Liczba pociskow wroga na ekranie: ";
-            std::cout<< this->enemy_bullets.size() << std::endl;
+//            std::cout<< "Liczba pociskow wroga na ekranie: ";
+//            std::cout<< this->enemy_bullets.size() << std::endl;
         }
     }
 
@@ -335,28 +351,102 @@ void Game::updateBonuses()
     }
 }
 
+void Game::updateBonuses2(int okres,int licznik)
+{
+    int counter = 0;
+    for (auto *bon2 : bonuses2)
+    {
+        bon2->update();
+
+        if(bon2->getBounds().top + bon2->getBounds().height > window_height) // kolizja z krawedzia ekranu
+        {
+            //usuwanie konkretnego wskaznika
+            delete this->bonuses2.at(counter);
+
+            //usuwanie go z wektora
+            this->bonuses2.erase(this->bonuses2.begin()+counter);
+            --counter;
+        }
+        if( player->getBounds().intersects( bon2->getBounds() ) )           // kolizja bonusu 2 z nami ( ma dzialac na 5 sekund )
+        {
+            int licznik_czasu2 = 0;
+            licznik_czasu2 += okres;
+//            elapsed.asMilliseconds();
+//            int i = elapsed.asMilliseconds();
+//            int czas = elapsed.asMilliseconds();
+//            czas=0;
+//            int okres = 50*czas;
+            if(licznik-licznik_czasu2 < 2000)
+            {
+//                bon2->setPosition(111,111);
+                bon2->setPosition(player->getPosition().x-55, player->getPosition().y-50);
+            }
+            else
+            {
+                bon2->setPosition(111,111);
+//                bon2->setPosition(player->getPosition().x-55, player->getPosition().y-50);
+            }
+
+            for(auto* bull : enemy_bullets)
+            {
+                if(bon2->getBounds().intersects(bull->getBounds()))             // kolizja bonusu 2 z pociskami wroga ( maja sie usuwac przy zderzeniu )
+                {
+//                    delete enemy_bullets.at(counter);                         // pure virtual method ( tu sie psuje )
+//                    this->bull.erase(this->bonuses.begin()+counter);
+//                    --counter;
+                }
+            }
+        }
+    }
+}
+
+void Game::updateBonuses3()
+{
+    int counter = 0;
+    for (auto *bon3 : bonuses3)
+    {
+        bon3->update();
+
+        if(bon3->getBounds().top + bon3->getBounds().height > window_height)            // zderzenie bonusu z krawedzia
+        {
+            //usuwanie konkretnego wskaznika
+            delete this->bonuses3.at(counter);
+
+            //usuwanie go z wektora
+            this->bonuses3.erase(this->bonuses3.begin()+counter);
+            --counter;
+        }
+        if( player->getBounds().intersects( bon3->getBounds() ) )                       // zderzenie bonusu z nami
+        {
+            player->speedUpAttack();
+
+            delete this->bonuses3.at(counter);
+            this->bonuses3.erase(this->bonuses3.begin()+counter);
+            --counter;
+        }
+    }
+}
+
 void Game::updateTimer()
 {
     spawnRule++;
 }
 
-//std::pair<int,int> Game::getRandomPosition(int res_x, int res_y)         // spawn w prostokacie ( antybug na blokowanie sie
-//{                                                                                       // przeciwnikow na krawedzi okienka aplikacji )
-//    int x = rand()%window_width;
-//    int y = rand()%window_height/2;
-//    int l_border = res_x/5;
-//    int r_border = 4*res_x/5;
-//    int t_border = res_y/8;
-//    int b_border = 3*res_y/5;
+std::pair<int,int> Game::getRandomPosition(int res_x, int res_y, int deadzone)         // spawn w prostokacie ( antybug na blokowanie sie
+{                                                                                       // przeciwnikow na krawedzi okienka aplikacji )
+    int x = 0;
+    int y = 0;
+    do
+    {
+        x = rand() % res_x;
+        y = rand() % res_y;
 
-//    do
-//    {
-//        int x = rand()%window_width;
-//        int y = rand()%window_height/2;
-//        return std::pair<int,int>(x,y);
-//    }
-//    while( (x > l_border and x < r_border and y > t_border and y < b_border) );
-//}
+    }
+//    Ustawianie przedzialu w jakim moga respic sie wrogowie. Granica:
+//                       prawa                         lewa                                dol                             gora
+    while(abs(x - res_x ) < deadzone or abs(x - res_x ) > deadzone+400 or (abs( y - res_y ) < deadzone ) or abs( y - res_y ) > deadzone+200);
+    return std::pair<int,int>(x,y);
+}
 
 
 void Game::updateEnemies()                                                           // SPAWN WROGOW
@@ -365,9 +455,10 @@ void Game::updateEnemies()                                                      
     {
         updateTimer();
         for (int i = 0; i<10; i++)
-        {                   //getRandomPosition(window_width,window_height).first,getRandomPosition(window_width,window_height).second
+        {                   //rand()%this->window->getSize().x, rand()%this->window->getSize().y/2
             this->enemies.push_back(new Enemy(this->textures["ENEMY1"],
-                                    rand()%this->window->getSize().x, rand()%this->window->getSize().y/2,
+                                    // w 3 zmiennej przesuwamy przedzial ( obie granice prawo-lewo lub gora-dol )
+                                    getRandomPosition(window_width,window_height,50).first,getRandomPosition(window_width,window_height,420).second,
                                     2.f, 2.f,
                                     2.f, 0.7,
                                     0.7, 5));
@@ -380,7 +471,7 @@ void Game::updateEnemies()                                                      
         for (int i = 0; i<7; i++)
         {
             this->enemies.push_back(new Enemy(this->textures["ENEMY2"],
-                                    rand()%this->window->getSize().x, rand()%this->window->getSize().y/2,
+                                    getRandomPosition(window_width,window_height,100).first,getRandomPosition(window_width,window_height,450).second,//rand()%this->window->getSize().x, rand()%this->window->getSize().y/2
                                     2.f,2.f,
                                     1.2f,1.0,
                                     1.0,10));
@@ -393,7 +484,7 @@ void Game::updateEnemies()                                                      
         for (int i = 0; i<5; i++)
         {
             this->enemies.push_back(new Enemy(this->textures["ENEMY3"],
-                                    rand()%this->window->getSize().x, rand()%this->window->getSize().y/2,
+                                    getRandomPosition(window_width,window_height,100).first,getRandomPosition(window_width,window_height,450).second,//rand()%this->window->getSize().x, rand()%this->window->getSize().y/2
                                     2.f,2.f,
                                     0.7f,1.2,
                                     1.2,20));
@@ -405,7 +496,7 @@ void Game::updateEnemies()                                                      
         for (int i = 0; i<1; i++)
         {
             this->enemies.push_back(new Enemy(this->textures["ENEMY3"],
-                                    rand()%this->window->getSize().x, rand()%this->window->getSize().y/2,
+                                    getRandomPosition(window_width,window_height,100).first,getRandomPosition(window_width,window_height,500).second,//rand()%this->window->getSize().x, rand()%this->window->getSize().y/2
                                     2.f,2.f,
                                     0.5f,2.0,
                                     2.0,50));
@@ -446,10 +537,12 @@ void Game::updateCombat()                                               // KOLIZ
 
                 if (enemies[i]->getHP() <= 0)                           // likwidacja wroga ( tu dodac animacje )
                 {
+                    int x = 0;
+                    x = rand()%10;
                     //usuwanie obiektu z wektora
                     this->enemies.erase(this->enemies.begin() +i);
 
-                    if (rand()%10 < 2) // szansa na wypadniecie tego konretnego bonusu
+                    if (x < 2) // szansa na wypadniecie tego konretnego bonusu
                     {
                         this->bonuses.push_back(new Bonus(this->textures["BONUS1"],
                                                 enemies[i]->getPos().x,//50
@@ -458,15 +551,24 @@ void Game::updateCombat()                                               // KOLIZ
                                                 10.f,
                                                 1.0f));
                     }
-//                    else
-//                    {
-//                        this->bonuses.push_back(new Bonus(this->textures["BONUS2"],
-//                                                enemies[i]->getPos().x,//50
-//                                                enemies[i]->getPos().y, //100
-//                                                0.f,
-//                                                10.f,
-//                                                1.0f));
-//                    }
+                    else if (x >= 4 and x < 7)
+                    {
+                        this->bonuses2.push_back(new bonus2(this->textures["BONUS2"],
+                                                enemies[i]->getPos().x,
+                                                enemies[i]->getPos().y,
+                                                0.f,
+                                                10.f,
+                                                1.0f));
+                    }
+                    else if(x >= 5 and x < 8)
+                    {
+                        this->bonuses3.push_back(new bonus3(this->textures["BONUS3"],
+                                                enemies[i]->getPos().x,
+                                                enemies[i]->getPos().y,
+                                                0.f,
+                                                8.f,
+                                                1.0f));
+                    }
                 }
             }
             // debugowanie
@@ -511,8 +613,8 @@ void Game::updateCombat()                                               // KOLIZ
 
 //        std::cout<< "Liczba pociskow na ekranie: ";
 //        std::cout<< this->bullets.size() << std::endl;
-        std::cout<< "Liczba pociskow wroga na ekranie: ";
-        std::cout<< this->enemy_bullets.size() << std::endl;
+//        std::cout<< "Liczba pociskow wroga na ekranie: ";
+//        std::cout<< this->enemy_bullets.size() << std::endl;
         ++counter;
     }
 
@@ -537,6 +639,8 @@ void Game::update()
     this->updateEnemyBullets();
     this->updateEnemies();
     this->updateBonuses();
+    this->updateBonuses3();
+//    this->updateBonuses2();
     this->updateCombat();
     this->updateGUI();
 }
@@ -571,6 +675,14 @@ void Game::render()
     for (auto *bon : bonuses)
     {
         bon->render(this->window);
+    }
+    for (auto *bon2 : bonuses2)
+    {
+        bon2->render(bon2,window);
+    }
+    for (auto *bon3 : bonuses3)
+    {
+        bon3->render(this->window);
     }
     for (auto *bull : enemy_bullets)
     {

@@ -6,12 +6,14 @@
 #include "bullet.h"
 #include "enemy.h"
 #include "bonus.h"
+#include "bonus2.h"
+#include "bonus3.h"
 #include "boss.h"
 #include <map>
 #include <string>
 #include <sstream>
 #include <math.h>
-
+#include <ctime>
 
 
 class Game
@@ -20,6 +22,9 @@ private:
     sf::RenderWindow* window;
     int window_width = 500;
     int window_height = 800;
+
+//    licznik do 2 bonusu
+    sf::Clock clock;
 
     // strzelanie i obrot w kierunku myszy
     sf::Vector2f mouse_position;
@@ -43,6 +48,8 @@ private:
     std::vector<Bullet*> enemy_bullets;     // pociski wroga
     std::vector<Enemy*> enemies;           // wrogowie
     std::vector<Bonus*> bonuses;          // bonusy
+    std::vector<bonus2*> bonuses2;       // bonusy2
+    std::vector<bonus3*> bonuses3;      // bonusy3
 
     //tlo
     sf::Texture texture_background;
@@ -68,7 +75,7 @@ public:
     //funkcje publiczne
     bool canAttack();
     int Hit(int howMany);
-    std::pair<int,int> getRandomPosition(int res_x, int res_y);
+    std::pair<int,int> getRandomPosition(int res_x, int res_y, int deadzone);
     void run();
 
     void updateEvents();
@@ -77,6 +84,8 @@ public:
     void updateBullets();
     void updateEnemyBullets();
     void updateBonuses();
+    void updateBonuses2(int czas,int licznik_czasu);
+    void updateBonuses3();
     void updateTimer();
     void updateEnemies();
     void updateCombat();

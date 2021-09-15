@@ -25,8 +25,10 @@ Player::Player()
     :      movementSpeed(10.f),
            attackCooldownMax(5.f),
            attackCooldown(attackCooldownMax),
+           attackSpeed(0.5f),
            HP(HPMax),
            damage(1)
+
 {
 //    this->initializeTexture();
 //    this->initializeSprite();
@@ -119,10 +121,14 @@ void Player::updateAttack()
 {
     if(this->attackCooldown < this->attackCooldownMax)
     {
-    this->attackCooldown += 0.5f;
+        this->attackCooldown += 0.5f * attackSpeed;
     }
 }
 
+void Player::speedUpAttack()
+{
+    attackSpeed *= 1.5;
+}
 void Player::update()
 {
     updateAttack();

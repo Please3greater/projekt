@@ -13,6 +13,7 @@ private:
     float movementSpeed;
     float attackCooldownMax;
     float attackCooldown;
+    float attackSpeed;
 
     const int HPMax = 100;
     int HP;
@@ -41,6 +42,7 @@ public:
 //    int Hit(Player *sprite);
     bool canAttack();
     void updateAttack();
+    void speedUpAttack();
     void update();
     void render(Player* player, sf::RenderTarget &target);
 
