@@ -1,12 +1,12 @@
 #include "enemy.h"
 //#include "explosion.h"
 
-Enemy::Enemy()
-:      damage(1),
-       attackCooldownMax(100.f),
-       attackCooldown(attackCooldownMax)
-{
-}
+//Enemy::Enemy()
+//:      damage(1),
+//       attackCooldownMax(100.f),
+//       attackCooldown(attackCooldownMax)
+//{
+//}
 
 
 sf::FloatRect Enemy::getBounds() // tu musi byc kopia bo bedzie sie bugowac (pamiec dynamiczna)
@@ -45,9 +45,7 @@ Enemy::Enemy(sf::Texture *texture, float posX, float posY, float dirX, float dir
          attackCooldownMax(100.f),
          attackCooldown(attackCooldownMax)
 {
-//    posX = getRandomPosition(500,800).first;
     setTexture(*texture);
-
     setPosition(posX,posY);
     scale(scaleX,scaleY);
     this->direction.x = dirX;
@@ -83,7 +81,7 @@ void Enemy::update()
 {
         sf::FloatRect rectangle_bounds = getGlobalBounds();
 
-        if(rectangle_bounds.top+rectangle_bounds.height > 400) // wartosci stale
+        if(rectangle_bounds.top+rectangle_bounds.height > 400)
         {
             direction.y = -(direction.y);
         }

@@ -10,7 +10,6 @@ private:
 
     sf::Vector2f direction;
     float movementSpeed;
-    int type;
     int HP;
     int HPMax;
     int damage;

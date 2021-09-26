@@ -4,6 +4,7 @@
 #pragma once
 #include "player.h"
 #include "bullet.h"
+#include "BossBullet.h"
 #include "enemy.h"
 #include "bonus.h"
 #include "bonus2.h"
@@ -25,6 +26,8 @@ private:
     int window_width = 500;
     int window_height = 800;
 
+    //warunek konca gry
+    int end = 0;
 //    licznik czasu do 2 bonusu
     sf::Clock clock;
 
@@ -49,10 +52,12 @@ private:
     //wektory obiektow
     std::vector<Bullet*> bullets;            // nasze pociski
     std::vector<Bullet*> enemy_bullets;     // pociski wroga
-    std::vector<Enemy*> enemies;           // wrogowie
-    std::vector<Bonus*> bonuses;          // bonusy
-    std::vector<bonus2*> bonuses2;       // bonusy2
-    std::vector<bonus3*> bonuses3;      // bonusy3
+    std::vector<BossBullet*> boss_bullets; // pociski bossa
+    std::vector<Enemy*> enemies;          // wrogowie
+    std::vector<Bonus*> bonuses;         // bonusy
+    std::vector<bonus2*> bonuses2;      // bonusy2
+    std::vector<bonus3*> bonuses3;     // bonusy3
+    std::vector<Boss*> bossess;       // boss
 //    std::vector<Explosion*> wybuchy;   // wybuchy
 
     //tlo
@@ -85,8 +90,8 @@ public:
     void updateEvents();
     void updateInput();
     void updateGUI();
-    void updateBullets();
     void updateEnemyBullets();
+    void updateBossBullets();
     void updateBonuses();
     void updateBonuses2();//clock_t initTime
     void updateBonuses3();

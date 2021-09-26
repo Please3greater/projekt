@@ -13,25 +13,20 @@ void Player::initializeTexture()
 
 void Player::initializeSprite()
 {
-    //wczytywanie tekstur do spritow
     setTexture(texture);
     scale(0.5f,0.5f);
-//    sprite->setPosition(250,640);
-    setOrigin(112.0/2.0,75.0/2.0); // na sztywno
+    setOrigin(112.0/2.0,75.0/2.0);
 }
 
-//KONSTRUKTOR I DESTRUKTOR
 Player::Player()
     :      movementSpeed(10.f),
            attackCooldownMax(5.f),
            attackCooldown(attackCooldownMax),
-           attackSpeed(0.6f),//0.5
+           attackSpeed(5.0f),
            HP(HPMax),
            damage(1)
 
 {
-//    this->initializeTexture();
-//    this->initializeSprite();
 }
 
 Player::~Player()
@@ -76,19 +71,12 @@ void Player::increaseHP(int damage)
 }
 
 
-//int Player::Hit(Player *sprite)
-//{
-//    return sprite->damage;
-//}
-
-
 //animacje z kolizje ze scianami
 void Player::animate(const float dirX, const float dirY)
 {
-//    this->sprite.move(this->movementSpeed * dirX, this->movementSpeed * dirY);
     sf::FloatRect sprite_bounds = getGlobalBounds();
 
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::W) and getGlobalBounds().top > 0) // wartosci stale
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::W) and getGlobalBounds().top > 0)
     {
         move(0,this->movementSpeed * dirY);
     }
@@ -104,7 +92,6 @@ void Player::animate(const float dirX, const float dirY)
     {
         move(this->movementSpeed * dirX,0);
     }
-
 }
 
 //licznik do inicjalizacji wyrzutu pocisku
@@ -129,10 +116,6 @@ void Player::updateAttack()
 void Player::speedUpAttack()
 {
     attackSpeed *= 1.5;
-}
-void Player::update()
-{
-    updateAttack();
 }
 
 void Player::render(Player* player, sf::RenderTarget &target)

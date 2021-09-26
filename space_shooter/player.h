@@ -14,7 +14,7 @@ private:
     float attackCooldown;
     float attackSpeed;
 
-    const int HPMax = 100;
+    int HPMax = 150;
     int HP;
 
     int damage;
@@ -39,7 +39,6 @@ public:
     bool canAttack();
     void updateAttack();
     void speedUpAttack();
-    void update();
     void render(Player* player, sf::RenderTarget &target);
 
     void initializeTexture();

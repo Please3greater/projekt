@@ -13,6 +13,8 @@ void Game::initializeTextures()
     this->textures["BULLET"]->loadFromFile("./../space_shooter/Tekstury/pocisk1.png");
     this->textures["BULLET2"] = new sf::Texture();                                      // pocisk wroga
     this->textures["BULLET2"]->loadFromFile("./../space_shooter/Tekstury/pocisk2.png");
+    this->textures["BULLET3"] = new sf::Texture();                                      // pocisk bossa
+    this->textures["BULLET3"]->loadFromFile("./../space_shooter/Tekstury/pocisk3.png");
     this->textures["ENEMY1"] = new sf::Texture();                                       // wrog 1
     this->textures["ENEMY1"]->loadFromFile("./../space_shooter/Tekstury/enemy1.png");
     this->textures["ENEMY2"] = new sf::Texture();                                       // wrog 2
@@ -103,7 +105,7 @@ Game::~Game()
     // usuwanie tekstur
     for (auto &tex : textures)
     {
-        delete tex.second; //
+        delete tex.second;
 //        delete tex.first;
     }
     // usuwanie pociskow
@@ -133,6 +135,12 @@ Game::~Game()
     for (auto &enemy : enemies)
     {
         delete enemy;
+    }
+
+    //usuwanie bossa
+    for (auto &boss : bossess)
+    {
+        delete boss;
     }
 
 }
@@ -177,106 +185,42 @@ void Game::updateInput()
     curPos.x = player->getPos().x;
     curPos.y = player->getPos().y;
 
-    //sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
-
     sf::Vector2f mouse_position = window->mapPixelToCoords(sf::Mouse::getPosition(*window));    // POZYCJA MYSZY
     float dx = curPos.x - mouse_position.x;
     float dy = curPos.y - mouse_position.y;
     const float PI = 3.14159265;
-    float rotation = std::atan2(dy,dx)*180.0/PI;
-
-    //debuger
-//    std::cout<<mouse_position.x<<"\t"<<mouse_position.y<<std::endl;
+    float rotation = std::atan2(dy,dx)*180.0/PI;    
+//    std::cout<<mouse_position.x<<"\t"<<mouse_position.y<<std::endl;               //debuger pozycji myszy
 
     player->setRotation(rotation-90);
 
-//    for(auto& bull : bullets)
-//    {
-//        bull->setRotation(rotation-90);
-//    }
-
-
-//    for(auto *bull : bullets)
-//    {
-//        sf::Vector2f curPos;                                                                        // POZYCJA OBIEKTU
-//        curPos.x = bull->getPos().x;
-//        curPos.y = bull->getPos().y;
-
-//        bull->setRotation(roration-90);    // pociski tez trzeba dziedziczyc po sf::Sprite, tak samo jak playera, zeby mozna bylo uzyc setRotation
-//    }
-
-
-
     // Ruszanie sie naszego statku                                                      // OBSLUGA KLAWISZY   ( RUCH )
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        player->animate(0.f,-1.f);
-    }
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        player->animate(0.f,1.f);
-    }
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-        player->animate(-1.f,0.f);
-    }
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-        player->animate(1.f,0.f);
-    }
-
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::W)) { player->animate(0.f,-1.f); }
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::S)) { player->animate(0.f,1.f);  }
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)) { player->animate(-1.f,0.f); }
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)) { player->animate(1.f,0.f);  }
 
     if( player->canAttack())                                                        // NASZE POCISKI
     {
         aimDir = mouse_position - player->getPos();                                 // kierunek w ktorym maja leciec nasze pociski ( do kursora )
         aimDirNorm = aimDir / static_cast<float>(sqrt(pow(aimDir.x, 2) + pow(aimDir.y, 2)));
 
-//        std::cout<<mouse_position.x<<"\t"<<mouse_position.y<<std::endl;
-//        for(auto *bull : bullets)
-//        {
-            this->bullets.push_back(new Bullet(textures["BULLET"],
-                                               player->getPos().x,
-                                               player->getPos().y,
-                                               aimDirNorm.x,
-                                               aimDirNorm.y,
-                                               10.f,
-                                               rotation-90));
-//        }
+        this->bullets.push_back(new Bullet(textures["BULLET"],
+                                           player->getPos().x,
+                                           player->getPos().y,
+                                           aimDirNorm.x,
+                                           aimDirNorm.y,
+                                           10.f,
+                                           rotation-90));
     }
 }
 
-
-void Game::updateBullets()
-{
-    int counter = 0;
-    for (auto *bull : bullets)
-    {
-        bull->update();
-//        for(auto enemy : enemies)
-//        {
-            //usuwanie pociskow                                                                             ( na sztywno )
-            if(bull->getBounds().top + bull->getBounds().height < window_height - window_height     or
-               bull->getBounds().top + bull->getBounds().height > window_height                     or
-               bull->getBounds().width + bull->getBounds().left > window_width                      or
-               bull->getBounds().width + bull->getBounds().left < window_width-window_width         )
-            {
-                //usuwanie konkretnego wskaznika
-                delete this->bullets.at(counter);
-                //usuwanie go z wektora
-                this->bullets.erase(this->bullets.begin()+counter);
-                --counter;
-
-
-            }
-//        }
-//        std::cout<< "Liczba pociskow na ekranie: ";
-//        std::cout<< this->bullets.size() << std::endl;
-        ++counter;
-    }
-}
 
 void Game::updateEnemyBullets() // ( and enemies )
-{                                                                                       //OBRACANIE SIE WROGOW DO NAS
+{                                                                                       // OBRACANIE SIE WROGOW DO NAS
     sf::Vector2f ourCurPos;                                         // nasza pozycja
     ourCurPos.x = player->getPos().x;
     ourCurPos.y = player->getPos().y;
-
 
 
     for (auto& e : enemies)                                                             // POCISKI WROGA
@@ -292,28 +236,52 @@ void Game::updateEnemyBullets() // ( and enemies )
 
         e->setRotation(rotation-90);
 
-        aimDir = e->getPos() - player->getPos();                                 // kierunek w ktorym maja leciec pociski wroga ( do nas )
+        aimDir = e->getPos() - player->getPos();                                    // kierunek w ktorym maja leciec pociski wroga ( do nas )
         aimDirNorm = aimDir / static_cast<float>(sqrt(pow(aimDir.x, 2) + pow(aimDir.y, 2)));
 
         if( e->canAttack())                                                         // teraz strzelaja wszystkie naraz w tym samym czasie
         {
-            e->updateAttack();                                                      // dodanie do wektora
+            e->updateAttack();
 
             this->enemy_bullets.push_back(new Bullet(textures["BULLET2"],
                                                      e->getPos().x,
                                                      e->getPos().y,
-                                                     aimDirNorm.x, //0.f
-                                                     aimDirNorm.y,//-10.f
-                                                     -10.f,//-0.5f
-                                                     rotation-270)); //static_cast<float>(setRotation(rotation-90))  bulletRotation()
+                                                     aimDirNorm.x,
+                                                     aimDirNorm.y,
+                                                     -10.f,
+                                                     rotation-270));
 //            std::cout<< "Liczba pociskow wroga na ekranie: ";
 //            std::cout<< this->enemy_bullets.size() << std::endl;
         }
     }
 
-    for (auto *bull : enemy_bullets)                                                // ruch
+    for (auto *bull : enemy_bullets)                                                // ruch pociskow wroga
     {
         bull->update();
+    }
+}
+
+void Game::updateBossBullets()
+{
+    for(auto& boss : bossess)
+    {
+        if(boss->canAttack())
+        {
+//            getRotation2 stad trzeba wziac kat strzelania bossa
+            boss->updateAttack();
+            this->boss_bullets.push_back(new BossBullet(textures["BULLET3"],    //tekstura              // dol
+                                         boss->getPos().x, boss->getPos().y,    // pozycje
+                                         cos(boss->getRotation() * M_PI /180), sin(boss->getRotation() * M_PI /180),//boss->getRotation2(boss) //0,5.f      // kierunki
+                                         10.f));                                // predkosc
+            this->boss_bullets.push_back(new BossBullet(textures["BULLET3"],                            // gora
+                                         boss->getPos().x, boss->getPos().y,
+                                         -cos(boss->getRotation() * M_PI /180), -sin(boss->getRotation() * M_PI /180),
+                                         10.f));
+            for(auto* bull : boss_bullets)
+            {
+                bull->update();
+            }
+        }
     }
 }
 
@@ -327,7 +295,7 @@ void Game::updateBonuses()
         if(bon->getBounds().top + bon->getBounds().height > window_height)
         {
             //usuwanie konkretnego wskaznika
-            delete this->bonuses.at(counter);
+//            delete this->bonuses.at(counter);
 
             //usuwanie go z wektora
             this->bonuses.erase(this->bonuses.begin()+counter);
@@ -336,7 +304,7 @@ void Game::updateBonuses()
         if( player->getBounds().intersects( bon->getBounds() ) )
         {
             player->increaseHP(bon->heal(bon->setHeal(player->getHPMax()/10)));
-            delete this->bonuses.at(counter);
+//            delete this->bonuses.at(counter);
 
             this->bonuses.erase(this->bonuses.begin()+counter);
             --counter;
@@ -354,7 +322,7 @@ void Game::updateBonuses2()//clock_t initTime
         if(bon2->getBounds().top + bon2->getBounds().height > window_height)    // kolizja z krawedzia ekranu
         {
             //usuwanie konkretnego wskaznika
-            delete this->bonuses2.at(counter);
+//            delete this->bonuses2.at(counter);
 
             //usuwanie go z wektora
             this->bonuses2.erase(this->bonuses2.begin()+counter);
@@ -405,7 +373,7 @@ void Game::updateBonuses3()
         if(bon3->getBounds().top + bon3->getBounds().height > window_height)            // zderzenie bonusu z krawedzia
         {
             //usuwanie konkretnego wskaznika
-            delete this->bonuses3.at(counter);
+//            delete this->bonuses3.at(counter);
 
             //usuwanie go z wektora
             this->bonuses3.erase(this->bonuses3.begin()+counter);
@@ -415,7 +383,7 @@ void Game::updateBonuses3()
         {
             player->speedUpAttack();
 
-            delete this->bonuses3.at(counter);
+//            delete this->bonuses3.at(counter);
             this->bonuses3.erase(this->bonuses3.begin()+counter);
             --counter;
         }
@@ -427,7 +395,7 @@ void Game::updateTimer()
     spawnRule++;
 }
 
-std::pair<int,int> Game::getRandomPosition(int res_x, int res_y, int deadzone)         // spawn w prostokacie ( antybug na blokowanie sie
+std::pair<int,int> Game::getRandomPosition(int res_x, int res_y, int deadzone)         // spawn w prostokacie ( antybuger na blokowanie sie
 {                                                                                       // przeciwnikow na krawedzi okienka aplikacji )
     int x = 0;
     int y = 0;
@@ -450,7 +418,7 @@ void Game::updateEnemies()                                                      
     {
         updateTimer();
         for (int i = 0; i<10; i++)
-        {                   //rand()%this->window->getSize().x, rand()%this->window->getSize().y/2
+        {
             this->enemies.push_back(new Enemy(this->textures["ENEMY1"],
                                     // w 3 zmiennej przesuwamy przedzial ( obie granice prawo-lewo lub gora-dol )
                                     getRandomPosition(window_width,window_height,50).first,getRandomPosition(window_width,window_height,420).second,
@@ -466,7 +434,7 @@ void Game::updateEnemies()                                                      
         for (int i = 0; i<7; i++)
         {
             this->enemies.push_back(new Enemy(this->textures["ENEMY2"],
-                                    getRandomPosition(window_width,window_height,100).first,getRandomPosition(window_width,window_height,450).second,//rand()%this->window->getSize().x, rand()%this->window->getSize().y/2
+                                    getRandomPosition(window_width,window_height,100).first,getRandomPosition(window_width,window_height,450).second,
                                     2.f,2.f,
                                     1.2f,1.0,
                                     1.0,10));
@@ -479,34 +447,41 @@ void Game::updateEnemies()                                                      
         for (int i = 0; i<5; i++)
         {
             this->enemies.push_back(new Enemy(this->textures["ENEMY3"],
-                                    getRandomPosition(window_width,window_height,100).first,getRandomPosition(window_width,window_height,450).second,//rand()%this->window->getSize().x, rand()%this->window->getSize().y/2
+                                    getRandomPosition(window_width,window_height,100).first,getRandomPosition(window_width,window_height,450).second,
                                     2.f,2.f,
                                     0.7f,1.2,
                                     1.2,20));
         }
     }
-    if(spawnRule == 23.f and enemies.empty())                                      // BOSS tu trzeba stworzc calkiem nowy, osobny obiekt
+    if(spawnRule == 23.f and enemies.empty())                                      // BOSS
     {
         updateTimer();
         for (int i = 0; i<1; i++)
         {
-            this->enemies.push_back(new Enemy(this->textures["ENEMY3"],
-                                    getRandomPosition(window_width,window_height,100).first,getRandomPosition(window_width,window_height,500).second,//rand()%this->window->getSize().x, rand()%this->window->getSize().y/2
-                                    2.f,2.f,
-                                    0.5f,2.0,
-                                    2.0,50));
+            this->bossess.push_back(new Boss(this->textures["ENEMY3"], // tekstura,
+                                    250,200,                           // pozycja x i y,
+                                    0.f,2.f,                           // kierunek lotu x i y,
+                                    1.0f,                              // predkosc lotu,
+                                    1.5,1.5,                           // skala x i y,
+                                    100));                             // ilosc HP
         }
+        end = 1;
     }
-//    else
-//    {
 
-//    }
-
-
-    for (auto *enemy : enemies)                // RUCH WROGOW
+    for (auto *enemy : enemies)                 // ruch statkow wroga
     {
         // movement and bounce
         enemy->update();
+    }
+    for(auto* boss : bossess)                   // ruch bossa
+    {
+        //movement and rotation
+        boss->update(1);
+        if(boss->getHP() <= 50)
+        {
+            boss->update(2);
+            boss->speedUpAttack();              // przyspieczenie ataku bossa
+        }
     }
 }
 
@@ -515,35 +490,37 @@ int Game::Hit(int howMany)
     return howMany;
 }
 
-void Game::updateCombat()                                               // KOLIZJE WALKA
+void Game::updateCombat()                                                           // KOLIZJE / WALKA
 {
-    // kolizje naszych pociskow ze statkami wroga
+    // 1. nasze pociski z czyms
+    // 2. nasz statek z czyms
+    // 3.pocisk wroga z czyms
     for (int i = 0; i < static_cast<int>(this->enemies.size()); i++)
     {
         for(int j=0; j< static_cast<int>(this->bullets.size()); j++)
         {
-            if(this->bullets[j]->getBounds().intersects(this->enemies[i]->getBounds()))
+            if(this->bullets[j]->getBounds().intersects(this->enemies[i]->getBounds())) // 1.2 kolizje naszych pociskow ze statkami wroga
             {
                 enemies[i]->decreaseHP();
-                //DEBUGER
-//                std::cout<< "HP wroga: " << std::endl;
-//                std::cout<< this->enemies[i]->getHP() << std::endl;
-               this->bullets.erase(this->bullets.begin() +j);           // POCISK MUSI USUWAC SIE PRZY ZDERZENIU Z WROGIEM, ZEBY ODJAC MU TYLKO 1 HP
 
-                if (enemies[i]->getHP() <= 0)                           // likwidacja wroga ( tu dodac animacje )
+//              std::cout<< "HP wroga: " << std::endl;
+//              std::cout<< this->enemies[i]->getHP() << std::endl;
+
+               this->bullets.erase(this->bullets.begin() +j);
+
+                if (enemies[i]->getHP() <= 0)                       // likwidacja wroga / usuwanie
                 {
                     int x = 0;
-                    x = rand()%10;
-                    //usuwanie obiektu z wektora
-                    this->enemies.erase(this->enemies.begin() +i);
+                    x = rand()%11;
+
+                    this->enemies.erase(this->enemies.begin() +i);  //usuwanie obiektu z wektora
+
                     ///
                     /// miejsce na wybuchy
-
                     ///
-
-                    if (x < 2) // szansa na wypadniecie tego konretnego bonusu
+                    if (x < 2)                                                          // szansa na wypadniecie tego konretnego bonusu
                     {
-                        this->bonuses.push_back(new Bonus(this->textures["BONUS1"],
+                        this->bonuses.push_back(new Bonus(this->textures["BONUS1"],     // apteczka
                                                 enemies[i]->getPos().x,//50
                                                 enemies[i]->getPos().y, //100
                                                 0.f,
@@ -552,7 +529,7 @@ void Game::updateCombat()                                               // KOLIZ
                     }
                     else if (x >= 4 and x < 7)
                     {
-                        this->bonuses2.push_back(new bonus2(this->textures["BONUS2"],
+                        this->bonuses2.push_back(new bonus2(this->textures["BONUS2"],   // tarcza
                                                 enemies[i]->getPos().x,
                                                 enemies[i]->getPos().y,
                                                 0.f,
@@ -561,7 +538,7 @@ void Game::updateCombat()                                               // KOLIZ
                     }
                     else if(x >= 5 and x < 8)
                     {
-                        this->bonuses3.push_back(new bonus3(this->textures["BONUS3"],
+                        this->bonuses3.push_back(new bonus3(this->textures["BONUS3"],   // wiecej pociskow na sekunde
                                                 enemies[i]->getPos().x,
                                                 enemies[i]->getPos().y,
                                                 0.f,
@@ -575,47 +552,104 @@ void Game::updateCombat()                                               // KOLIZ
 //            std::cout<< this->enemies.size() << std::endl;
         }
 
-
-        //kolizje naszego statku ze statkami wroga
-        if (player->getBounds().intersects(enemies[i]->getBounds()))
+        if (player->getBounds().intersects(enemies[i]->getBounds()))                // 2.1 kolizje naszego statku ze statkami wroga
         {
             enemies[i]->decreaseHP();
             player->decreaseHP(this->enemies[i]->Hit());
-//            std::cout<<player->getHP(player)<<std::endl;    //debugger ilosci hp
+//            std::cout<<player->getHP(player)<<std::endl;  //debugger ilosci naszych hp
         }
     }
 
 
-    // kolizje pociskow wroga z naszym statkiem // usuwanie pociskow wroga
+    for(int i = 0; i < static_cast<int>(this->bossess.size()); i++)
+    {
+        for(int j=0; j< static_cast<int>(this->bullets.size()); j++)
+        {
+            if(this->bullets[j]->getBounds().intersects(this->bossess[i]->getBounds()))     // 1.3 kolizje naszych pociskow z bossem
+            {
+                bossess[i]->decreaseHP();
+                this->bullets.erase(this->bullets.begin() +j);
+
+                if (bossess[i]->getHP() <= 0)   // usuwanie bossa
+                {
+                    this->bossess.erase(this->bossess.begin() +i);
+                }
+            }
+        }
+
+        if (player->getBounds().intersects(bossess[i]->getBounds()))                        // 2.2 kolizja naszego statku z bossem
+        {
+            bossess[i]->decreaseHP();
+            player->decreaseHP(this->bossess[i]->Hit());
+        }
+    }
+
+
     int counter = 0;
     for (auto *bull : enemy_bullets)
     {
-        if(bull->getBounds().top > window_height)                       // pocisk poza ekranem aplikacji
+        if(bull->getBounds().top > window_height                or                  // 3.1 pocisk wroga poza ekranem aplikacji
+           bull->getBounds().top < 0                            or
+           bull->getBounds().left + bull->getBounds().width < 0 or
+           bull->getBounds().left >window_width                 )
         {
-            //usuwanie konkretnego wskaznika
-            delete this->enemy_bullets.at(counter);
-            //usuwanie go z wektora
+//            delete this->enemy_bullets.at(counter);
             this->enemy_bullets.erase(this->enemy_bullets.begin()+counter);
             --counter;
         }
-        if(bull->getBounds().intersects(player->getBounds()))     // pocisk przy zderzeniu z naszym statkiem
+        if(bull->getBounds().intersects(player->getBounds()))           // 3.2 pocisk wroga przy zderzeniu z naszym statkiem / kolizje
         {
-//            for(auto& enemy:enemies)
-//            {                                                 // napisanie for enemy : enemies nie dziala, bo cos wykracza poza skale
-                player->decreaseHP(Hit(1));//enemy->Hit()       // tu by sie przydalo zlinkowac jakos hit() obiektu enemy
-                delete this->enemy_bullets.at(counter);
-                //usuwanie go z wektora
-                this->enemy_bullets.erase(this->enemy_bullets.begin()+counter);
-                --counter;
-//            }
+            player->decreaseHP(Hit(1));
+//            delete this->enemy_bullets.at(counter);
+            this->enemy_bullets.erase(this->enemy_bullets.begin()+counter);
+            --counter;
         }
-
-//        std::cout<< "Liczba pociskow na ekranie: ";
-//        std::cout<< this->bullets.size() << std::endl;
-//        std::cout<< "Liczba pociskow wroga na ekranie: ";
-//        std::cout<< this->enemy_bullets.size() << std::endl;
         ++counter;
     }
+
+    int counter2 = 0;
+    for (auto *bull : bullets)                                          // 1.1 nasze pociski przy zderzeniu ze sciana
+    {
+        bull->update();
+
+        if(bull->getBounds().top + bull->getBounds().height < window_height - window_height     or      // usuwanie pociskow przy
+           bull->getBounds().top + bull->getBounds().height > window_height                     or      // zderzeniu ze sciana
+           bull->getBounds().width + bull->getBounds().left > window_width                      or
+           bull->getBounds().width + bull->getBounds().left < window_width-window_width         )
+        {
+//            delete this->bullets.at(counter2);                       //usuwanie konkretnego wskaznika
+            this->bullets.erase(this->bullets.begin()+counter2);     //usuwanie go z wektora
+            --counter2;
+        }
+        ++counter2;
+    }
+
+    int counter3 = 0;
+    for (auto *bull : boss_bullets)
+    {
+//        if(bull->getBounds().top > window_height                or                  // 3.1 pocisk bossa poza ekranem aplikacji
+//           bull->getBounds().top < 0                            or
+//           bull->getBounds().left + bull->getBounds().width < 0 or
+//           bull->getBounds().left >window_width                 )
+//        {
+////            delete this->enemy_bullets.at(counter3);
+//            this->enemy_bullets.erase(this->enemy_bullets.begin()+counter3);
+//            --counter3;
+//        }
+        if(bull->getBounds().intersects(player->getBounds()))           // 3.2 pocisk bossa przy zderzeniu z naszym statkiem / kolizje
+        {
+            for(auto* boss : bossess)
+            {
+                player->decreaseHP(boss->Hit());
+//                delete this->enemy_bullets.at(counter3);
+//                this->enemy_bullets.erase(this->enemy_bullets.begin()+counter3);
+                --counter3;
+            }
+
+        }
+        ++counter3;
+    }
+
 
 
 }
@@ -631,11 +665,10 @@ void Game::updateGUI()
 
 void Game::update()
 {
-//    this->updateEvents();
     this->updateInput();
-    this->player->update();
-    this->updateBullets();
+    this->player->updateAttack();
     this->updateEnemyBullets();
+    this->updateBossBullets();
     this->updateEnemies();
     this->updateBonuses();
     this->updateBonuses3();
@@ -645,10 +678,7 @@ void Game::update()
 }
 
 
-
-
 /// rysowanie
-
 void Game::renderGUI()
 {
     this->window->draw(this->myText);
@@ -668,6 +698,10 @@ void Game::render()
     this->player->render(player,*this->window);
 
     for (auto *bull : bullets)
+    {
+        bull->render(bull,window);
+    }
+    for (auto *bull : boss_bullets)
     {
         bull->render(bull,window);
     }
@@ -691,6 +725,10 @@ void Game::render()
     {
         enemy->render(enemy,window);
     }
+    for (auto *boss : bossess)
+    {
+        boss->render(boss,window);
+    }
     this->renderGUI();
 
     //game over text
@@ -699,8 +737,9 @@ void Game::render()
         this->window->draw(this->GameOver_text);
     }
 
-    if(enemies.empty())                 // tu trzeba dac warunek dla istnienia bossa, a nie dla pustego wektora, bo po kazdej fali wektor
-    {                                   // jest pusty i to sie zalacza na chwile
+    //end
+    if(bossess.empty() and end == 1)
+    {
         this->window->draw(this->YouWin_text);
     }
 

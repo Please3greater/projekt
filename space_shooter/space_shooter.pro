@@ -4,6 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+        BossBullet.cpp \
         bonus.cpp \
         bonus2.cpp \
         bonus3.cpp \
@@ -23,6 +24,7 @@ CONFIG(debug, debug|release){
 }
 
 HEADERS += \
+    BossBullet.h \
     bonus.h \
     bonus2.h \
     bonus3.h \

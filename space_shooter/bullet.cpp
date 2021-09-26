@@ -17,8 +17,6 @@ const sf::Vector2f &Bullet::getPos() const
 
 Bullet::Bullet(sf::Texture *texture, float posX, float posY, float dirX, float dirY, float movement_speed, float rotation)
 {
-    // jesli obiekty klasy Bullet dziedzicza po sf::Sprite, to zeby wywolac jakas metode klasy Bullet nie potrzeba nam odwolywac sie do obiektow
-    // klasy Bullet w sposob sprite.funkcja(), tylko wystarczy sama funkcja()
     setTexture(*texture);
 
     setPosition(posX,posY);

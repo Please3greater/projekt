@@ -1,10 +1,10 @@
+debug/BossBullet.o
 debug/bonus.o
 debug/bonus2.o
 debug/bonus3.o
 debug/boss.o
 debug/bullet.o
 debug/enemy.o
-debug/explosion.o
 debug/game.o
 debug/main.o
 debug/player.o
