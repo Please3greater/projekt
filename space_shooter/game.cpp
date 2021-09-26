@@ -149,13 +149,6 @@ void Game::run()
 {
     while(this->window->isOpen())
     {
-        sf::Time elapsed = clock.restart();
-        int licznik_czasu = 0;
-        licznik_czasu += elapsed.asMilliseconds();
-        int czas = elapsed.asMilliseconds();
-
-        updateBonuses2(czas,licznik_czasu);
-
         this->updateEvents();
         if(player->getHP() >0)
         {
@@ -351,14 +344,14 @@ void Game::updateBonuses()
     }
 }
 
-void Game::updateBonuses2(int okres,int licznik)
+void Game::updateBonuses2()//clock_t initTime
 {
     int counter = 0;
     for (auto *bon2 : bonuses2)
     {
         bon2->update();
 
-        if(bon2->getBounds().top + bon2->getBounds().height > window_height) // kolizja z krawedzia ekranu
+        if(bon2->getBounds().top + bon2->getBounds().height > window_height)    // kolizja z krawedzia ekranu
         {
             //usuwanie konkretnego wskaznika
             delete this->bonuses2.at(counter);
@@ -367,36 +360,38 @@ void Game::updateBonuses2(int okres,int licznik)
             this->bonuses2.erase(this->bonuses2.begin()+counter);
             --counter;
         }
-        if( player->getBounds().intersects( bon2->getBounds() ) )           // kolizja bonusu 2 z nami ( ma dzialac na 5 sekund )
+
+        if( player->getBounds().intersects( bon2->getBounds() ) )               // kolizja bonusu 2 z nami ( ma dzialac na 5 sekund )
         {
-            int licznik_czasu2 = 0;
-            licznik_czasu2 += okres;
-//            elapsed.asMilliseconds();
-//            int i = elapsed.asMilliseconds();
-//            int czas = elapsed.asMilliseconds();
-//            czas=0;
-//            int okres = 50*czas;
-            if(licznik-licznik_czasu2 < 2000)
+            if(!player->czyMaTarcze)
             {
-//                bon2->setPosition(111,111);
-                bon2->setPosition(player->getPosition().x-55, player->getPosition().y-50);
+                player->czyMaTarcze = true;
+                clock.restart();
             }
             else
             {
-                bon2->setPosition(111,111);
-//                bon2->setPosition(player->getPosition().x-55, player->getPosition().y-50);
-            }
+                bon2->setPosition(player->getPosition().x-55, player->getPosition().y-50);
 
-            for(auto* bull : enemy_bullets)
-            {
-                if(bon2->getBounds().intersects(bull->getBounds()))             // kolizja bonusu 2 z pociskami wroga ( maja sie usuwac przy zderzeniu )
+                for(auto *ebull : enemy_bullets)                                // kolizja pociskow wroga z nasza tarcza
                 {
-//                    delete enemy_bullets.at(counter);                         // pure virtual method ( tu sie psuje )
-//                    this->bull.erase(this->bonuses.begin()+counter);
-//                    --counter;
+                    if(bon2->getBounds().intersects(ebull->getBounds()))
+                    {
+//                        delete ebull->at(counter);
+                        this->enemy_bullets.erase(enemy_bullets.begin()+counter);
+                        --counter;
+                    }
+                }
+
+                if( clock.getElapsedTime().asSeconds() > 5.0f )
+                {
+//                    delete bonuses2.at(counter);
+                    this->bonuses2.erase(bonuses2.begin()+counter);
+                    player->czyMaTarcze = false;
+                    --counter;
                 }
             }
         }
+
     }
 }
 
@@ -541,6 +536,10 @@ void Game::updateCombat()                                               // KOLIZ
                     x = rand()%10;
                     //usuwanie obiektu z wektora
                     this->enemies.erase(this->enemies.begin() +i);
+                    ///
+                    /// miejsce na wybuchy
+
+                    ///
 
                     if (x < 2) // szansa na wypadniecie tego konretnego bonusu
                     {
@@ -640,7 +639,7 @@ void Game::update()
     this->updateEnemies();
     this->updateBonuses();
     this->updateBonuses3();
-//    this->updateBonuses2();
+    this->updateBonuses2();
     this->updateCombat();
     this->updateGUI();
 }

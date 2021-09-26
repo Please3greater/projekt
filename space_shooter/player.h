@@ -8,7 +8,6 @@
 class Player : public sf::Sprite
 {
 private:
-//    sf::Sprite sprite;
     sf::Texture texture;
     float movementSpeed;
     float attackCooldownMax;
@@ -20,9 +19,8 @@ private:
 
     int damage;
 
-
-
 public:
+    bool czyMaTarcze = false;
     Player();
     virtual ~Player();
 
@@ -30,7 +28,6 @@ public:
     const sf::Vector2f &getPos() const;
     const sf::FloatRect getBounds() const;
 
-//    void setPosition(const sf::Vector2f pos);
     void setPosition2(const float x, const float y);
 
     //funkcje
@@ -39,14 +36,12 @@ public:
     int getHPMax();
     void decreaseHP(int damage);
     void increaseHP(int damage);
-//    int Hit(Player *sprite);
     bool canAttack();
     void updateAttack();
     void speedUpAttack();
     void update();
     void render(Player* player, sf::RenderTarget &target);
 
-    // funckje prywatne
     void initializeTexture();
     void initializeSprite();
 };

@@ -25,7 +25,7 @@ Player::Player()
     :      movementSpeed(10.f),
            attackCooldownMax(5.f),
            attackCooldown(attackCooldownMax),
-           attackSpeed(0.5f),
+           attackSpeed(0.6f),//0.5
            HP(HPMax),
            damage(1)
 
@@ -74,6 +74,7 @@ void Player::increaseHP(int damage)
 {
     HP = HP + damage;
 }
+
 
 //int Player::Hit(Player *sprite)
 //{

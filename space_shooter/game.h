@@ -8,12 +8,14 @@
 #include "bonus.h"
 #include "bonus2.h"
 #include "bonus3.h"
+//#include "explosion.h"
 #include "boss.h"
 #include <map>
 #include <string>
 #include <sstream>
 #include <math.h>
 #include <ctime>
+#include <time.h>
 
 
 class Game
@@ -23,7 +25,7 @@ private:
     int window_width = 500;
     int window_height = 800;
 
-//    licznik do 2 bonusu
+//    licznik czasu do 2 bonusu
     sf::Clock clock;
 
     // strzelanie i obrot w kierunku myszy
@@ -42,6 +44,7 @@ private:
 
     //Textury
     std::map<std::string, sf::Texture*> textures;
+//    std::vector<sf::Texture> animacje;         // wybuchy
 
     //wektory obiektow
     std::vector<Bullet*> bullets;            // nasze pociski
@@ -50,6 +53,7 @@ private:
     std::vector<Bonus*> bonuses;          // bonusy
     std::vector<bonus2*> bonuses2;       // bonusy2
     std::vector<bonus3*> bonuses3;      // bonusy3
+//    std::vector<Explosion*> wybuchy;   // wybuchy
 
     //tlo
     sf::Texture texture_background;
@@ -84,7 +88,7 @@ public:
     void updateBullets();
     void updateEnemyBullets();
     void updateBonuses();
-    void updateBonuses2(int czas,int licznik_czasu);
+    void updateBonuses2();//clock_t initTime
     void updateBonuses3();
     void updateTimer();
     void updateEnemies();
