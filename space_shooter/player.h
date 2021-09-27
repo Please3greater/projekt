@@ -21,6 +21,7 @@ private:
 
 public:
     bool czyMaTarcze = false;
+
     Player();
     virtual ~Player();
 
@@ -28,21 +29,24 @@ public:
     const sf::Vector2f &getPos() const;
     const sf::FloatRect getBounds() const;
 
-    void setPosition2(const float x, const float y);
-
-    //funkcje
+    //ruch
     void animate(const float dirX, const float dirY);
+
+    //HP
     int getHP() ;
     int getHPMax();
     void decreaseHP(int damage);
     void increaseHP(int damage);
+
+    //attack
     bool canAttack();
     void updateAttack();
     void speedUpAttack();
-    void render(Player* player, sf::RenderTarget &target);
 
+    //rysowanie
     void initializeTexture();
     void initializeSprite();
+    void render(Player* player, sf::RenderTarget &target);
 };
 
 #endif // PLAYER_H

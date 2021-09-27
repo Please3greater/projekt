@@ -5,7 +5,6 @@
 #include<SFML/Graphics.hpp>
 
 
-
 class Bullet : public sf::Sprite
 {
 private:

@@ -1,6 +1,6 @@
 #include "player.h"
 
-                            // FUNKCJE PRYWATNE
+
 void Player::initializeTexture()
 {
     // wczytywanie tekstur
@@ -22,7 +22,7 @@ Player::Player()
     :      movementSpeed(10.f),
            attackCooldownMax(5.f),
            attackCooldown(attackCooldownMax),
-           attackSpeed(5.0f),
+           attackSpeed(0.6f),
            HP(HPMax),
            damage(1)
 
@@ -35,7 +35,6 @@ Player::~Player()
 }
 
 
-// FUNKCJE PUBLICZNE
 const sf::Vector2f &Player::getPos() const
 {
     return getPosition();
@@ -44,11 +43,6 @@ const sf::Vector2f &Player::getPos() const
 const sf::FloatRect Player::getBounds() const
 {
     return getGlobalBounds();
-}
-
-void Player::setPosition2(const float x, const float y)
-{
-    setPosition(x,y);
 }
 
 int Player::getHP()

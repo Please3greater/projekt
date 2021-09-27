@@ -21,8 +21,8 @@ private:
 
 public:
     Boss();
-    Boss(sf::Texture *texture, float posX, float posY, float dirX, float dirY, float movement_speed, // tekstura, pozycja x i y, kierunek x i y, predkosc
-         float scaleX, float scaleY, int hp);                                        // skala x i y, HP, rotacja
+    Boss(sf::Texture *texture, float posX, float posY, float dirX, float dirY,  // tekstura, pozycja x i y, kierunek ruchu x i y,
+          float movement_speed,float scaleX, float scaleY, int hp);             //  predkosc skala x i y, HP, rotacja
     virtual ~Boss();
 
     //krawedzie
@@ -31,15 +31,17 @@ public:
 
     // HP
     const int &getHP() const;
-    void decreaseHP(); //int damage
+    void decreaseHP();
     int Hit();
 
     //walka
     bool canAttack();
-    void updateAttack();
     void speedUpAttack();
-    int getRotation2(Boss* sprite);
+
+    // ruch
     void update(int rotation);
+
+    //render
     void render(Boss *sprite, sf::RenderTarget *target);
 };
 

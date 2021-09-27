@@ -21,7 +21,10 @@ public:
     // krawedzie grafiki
     const sf::FloatRect getBounds() const;
 
+    // ruch
     void update();
+
+    // render
     void render(bonus2* sprite, sf::RenderTarget *target);
 
 

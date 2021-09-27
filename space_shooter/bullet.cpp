@@ -18,13 +18,13 @@ const sf::Vector2f &Bullet::getPos() const
 Bullet::Bullet(sf::Texture *texture, float posX, float posY, float dirX, float dirY, float movement_speed, float rotation)
 {
     setTexture(*texture);
-
     setPosition(posX,posY);
     scale(0.5,0.5);
+    setRotation(rotation);
+
     direction.x = dirX;
     direction.y = dirY;
     movementSpeed = movement_speed;
-    setRotation(rotation);
 }
 
 Bullet::~Bullet()
@@ -32,7 +32,7 @@ Bullet::~Bullet()
 
 }
 
-void Bullet::update()//, float rotation
+void Bullet::update()
 {
     move(this->movementSpeed * this->direction);
 }

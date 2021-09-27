@@ -20,6 +20,7 @@ BossBullet::BossBullet(sf::Texture *texture, float posX, float posY, float dirX,
     setTexture(*texture);
     setPosition(posX,posY);
     scale(0.5,0.5);
+
     direction.x = dirX;
     direction.y = dirY;
     movementSpeed = movement_speed;

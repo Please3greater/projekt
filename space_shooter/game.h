@@ -9,27 +9,30 @@
 #include "bonus.h"
 #include "bonus2.h"
 #include "bonus3.h"
-//#include "explosion.h"
+#include "explosion.h"
 #include "boss.h"
 #include <map>
 #include <string>
 #include <sstream>
 #include <math.h>
-#include <ctime>
 #include <time.h>
+#include <SFML/Audio.hpp>
 
 
 class Game
 {
 private:
+    // wymiary okienka gry
     sf::RenderWindow* window;
     int window_width = 500;
     int window_height = 800;
 
-    //warunek konca gry
-    int end = 0;
-//    licznik czasu do 2 bonusu
+    // licznik czasu do 2 bonusu
     sf::Clock clock;
+
+    //muzyka
+    sf::Music music;
+    sf::Music music2;
 
     // strzelanie i obrot w kierunku myszy
     sf::Vector2f mouse_position;
@@ -45,9 +48,12 @@ private:
     //licznik do spawnu wrogow
     float spawnRule;
 
+    // warunek konca gry
+    int end = 0;
+
     //Textury
-    std::map<std::string, sf::Texture*> textures;
-//    std::vector<sf::Texture> animacje;         // wybuchy
+    std::map<std::string, sf::Texture*> textures;   //tekstury
+//    std::vector<std::pair<std::string,sf::Texture*>> expl_textures; // tekstury wybuchow
 
     //wektory obiektow
     std::vector<Bullet*> bullets;            // nasze pociski
@@ -58,19 +64,20 @@ private:
     std::vector<bonus2*> bonuses2;      // bonusy2
     std::vector<bonus3*> bonuses3;     // bonusy3
     std::vector<Boss*> bossess;       // boss
-//    std::vector<Explosion*> wybuchy;   // wybuchy
+//    std::vector<Explosion*> wybuchy; // wybuchy
 
     //tlo
     sf::Texture texture_background;
     sf::Sprite background;
 
     // set naszej postaci w grze
-    Player* player; //wskaznik typu Player ( utworzenie )
+    Player* player;
     unsigned HP;
     unsigned HPMax;
 
     //inicjowanie wszystkiego
     void initializeBackground();
+    void initializeMusic();
     void initializeWindow();
     void initializeTextures();
     void initializeGUI();
@@ -93,7 +100,7 @@ public:
     void updateEnemyBullets();
     void updateBossBullets();
     void updateBonuses();
-    void updateBonuses2();//clock_t initTime
+    void updateBonuses2();
     void updateBonuses3();
     void updateTimer();
     void updateEnemies();

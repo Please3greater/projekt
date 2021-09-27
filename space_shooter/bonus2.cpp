@@ -17,7 +17,6 @@ bonus2::bonus2(sf::Texture *texture, float posX, float posY, float dirX, float d
     setScale(0.8,0.8);
 
     setPosition(posX,posY);
-//    scale(1,1);
     direction.x = dirX;
     direction.y = dirY;
     movementSpeed = movement_speed;
@@ -27,7 +26,6 @@ bonus2::~bonus2()
 {
 
 }
-
 
 void bonus2::update()
 {

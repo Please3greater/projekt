@@ -1,13 +1,11 @@
+#pragma once
 #include <iostream>
 #include<SFML/Graphics.hpp>
-
 
 
 class Enemy : public sf::Sprite
 {
 private:
-//    sf::Sprite shape;
-
     sf::Vector2f direction;
     float movementSpeed;
     int HP;
@@ -27,7 +25,7 @@ public:
 
     // HP
     const int &getHP() const;
-    void decreaseHP(); //int damage
+    void decreaseHP();
     int Hit();
 
     bool canAttack();

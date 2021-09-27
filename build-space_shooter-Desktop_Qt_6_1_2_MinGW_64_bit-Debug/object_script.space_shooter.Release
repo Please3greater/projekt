@@ -5,6 +5,7 @@ release/bonus3.o
 release/boss.o
 release/bullet.o
 release/enemy.o
+release/explosion.o
 release/game.o
 release/main.o
 release/player.o

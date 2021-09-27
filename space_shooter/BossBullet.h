@@ -19,7 +19,9 @@ public:
     const sf::FloatRect getBounds() const;
     const sf::Vector2f &getPos() const;
 
+    // atakowanie
     void updateAttack();
+
     void update();
     void render(BossBullet *sprite, sf::RenderTarget *target);
 };

@@ -11,6 +11,7 @@ SOURCES += \
         boss.cpp \
         bullet.cpp \
         enemy.cpp \
+        explosion.cpp \
         game.cpp \
         main.cpp \
         player.cpp
@@ -31,5 +32,6 @@ HEADERS += \
     boss.h \
     bullet.h \
     enemy.h \
+    explosion.h \
     game.h \
     player.h

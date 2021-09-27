@@ -20,34 +20,24 @@ bool Boss::canAttack()
     }
     if(this->attackCooldown < this->attackCooldownMax)
     {
-//        this->attackCooldown++;
         this->attackCooldown += 0.5f * attackSpeed;
-        return false;
     }
     return false;
 }
 
-
-void Boss::updateAttack()
-{
-//    if(this->attackCooldown < this->attackCooldownMax)
-//    {
-//    this->attackCooldown += 0.5f * attackSpeed;
-//    }
-}
-
-
-Boss::Boss(sf::Texture *texture, float posX, float posY, float dirX, float dirY, float movement_speed,
-           float scaleX, float scaleY, int hp)
+Boss::Boss(sf::Texture *texture, float posX, float posY, float dirX, float dirY,
+           float movement_speed, float scaleX, float scaleY, int hp)
     : damage(1), attackCooldownMax(5.f), attackCooldown(attackCooldownMax), attackSpeed(5.0f)
 {
     setTexture(*texture);
     setPosition(posX,posY);
+    setOrigin(102/2,84/2);
     scale(scaleX,scaleY);
+
     direction.x = dirX;
     direction.y = dirY;
     movementSpeed = movement_speed;
-    setOrigin(102/2,84/2);
+
     this->HP = hp;
 }
 
@@ -90,12 +80,6 @@ void Boss::update(int rotation)
     }
     move(this->movementSpeed * this->direction);
     rotate(rotation);
-}
-
-int Boss::getRotation2(Boss* sprite)
-{
-    int zm = sprite->getRotation();
-    return zm;
 }
 
 void Boss::render(Boss* sprite, sf::RenderTarget *target)

@@ -5,6 +5,11 @@ Bonus::Bonus()
 
 }
 
+Bonus::~Bonus()
+{
+
+}
+
 
 const sf::FloatRect Bonus::getBounds() const
 {
@@ -23,10 +28,6 @@ Bonus::Bonus(sf::Texture *texture, float posX, float posY, float dirX, float dir
     this->movementSpeed = movement_speed;
 }
 
-Bonus::~Bonus()
-{
-
-}
 
 int Bonus::setHeal(int howMany)
 {

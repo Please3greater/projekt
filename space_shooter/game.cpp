@@ -1,6 +1,6 @@
 #include "game.h"
 
-//funkcje prywatne
+
 void Game::initializeWindow()
 {
     this->window = new sf::RenderWindow(sf::VideoMode(window_width,window_height), "Galaxy shooter");
@@ -27,6 +27,28 @@ void Game::initializeTextures()
     this->textures["BONUS2"]->loadFromFile("./../space_shooter/Tekstury/bonus2.png");
     this->textures["BONUS3"] = new sf::Texture();                                       // szybsze pociski
     this->textures["BONUS3"]->loadFromFile("./../space_shooter/Tekstury/bonus3.png");
+
+
+//    expl_textures[0].first="EXPL1";
+//    expl_textures[0].second = new sf::Texture();
+//    expl_textures[0].second->loadFromFile("./../space_shooter/Tekstury/expl1.png");
+//    expl_textures[0].second=loadFromFile("./../space_shooter/Tekstury/expl1.png");
+//    this->expl_textures["EXPL1"] = new sf::Texture();                                       // wybuch 1
+//    this->expl_textures["EXPL1"]->loadFromFile("./../space_shooter/Tekstury/expl1.png");
+//    this->expl_textures["EXPL2"] = new sf::Texture();                                       // wybuch 2
+//    this->expl_textures["EXPL2"]->loadFromFile("./../space_shooter/Tekstury/expl2.png");
+//    this->expl_textures["EXPL3"] = new sf::Texture();                                       // wybuch 3
+//    this->expl_textures["EXPL3"]->loadFromFile("./../space_shooter/Tekstury/expl3.png");
+//    this->expl_textures["EXPL4"] = new sf::Texture();                                       // wybuch 4
+//    this->expl_textures["EXPL4"]->loadFromFile("./../space_shooter/Tekstury/expl4.png");
+//    this->expl_textures["EXPL5"] = new sf::Texture();                                       // wybuch 5
+//    this->expl_textures["EXPL5"]->loadFromFile("./../space_shooter/Tekstury/expl5.png");
+//    this->expl_textures["EXPL6"] = new sf::Texture();                                       // wybuch 6
+//    this->expl_textures["EXPL6"]->loadFromFile("./../space_shooter/Tekstury/expl6.png");
+//    this->expl_textures["EXPL7"] = new sf::Texture();                                       // wybuch 7
+//    this->expl_textures["EXPL7"]->loadFromFile("./../space_shooter/Tekstury/expl7.png");
+//    this->expl_textures["EXPL8"] = new sf::Texture();                                       // wybuch 8
+//    this->expl_textures["EXPL8"]->loadFromFile("./../space_shooter/Tekstury/expl8.png");
 }
 
 void Game::initializeBackground()
@@ -41,6 +63,12 @@ void Game::initializeBackground()
     background.setPosition(0,0);
     background.setOrigin(0,0);
     background.setScale(1,1);
+}
+
+void Game::initializeMusic()
+{
+    music.openFromFile("./../space_shooter/Muzyka/Juiced-Up-Cyberpunk-2077-Soundtrack.wav");
+    music.play();
 }
 
 void Game::initializeGUI()
@@ -66,15 +94,12 @@ void Game::initializeGUI()
     this->YouWin_text.setFillColor(sf::Color::White);
     this->YouWin_text.setString("YOU WIN!");
     this->YouWin_text.setPosition(window_width/2 - YouWin_text.getGlobalBounds().width/2,window_height/2 - YouWin_text.getGlobalBounds().height/2);
-
-
 }
 
 void Game::initializePlayer()
 {
     this->player = new Player();
-
-    this->player->setPosition2(window_width/2, 0.8*window_height); // na sztywno
+    this->player->setPosition(window_width/2, 0.8*window_height);
     this->player->initializeTexture();
     this->player->initializeSprite();
     this->HPMax = this->player->getHPMax();
@@ -85,17 +110,18 @@ void Game::initializeEnemies()
     this->spawnRule = 20.0f;
 }
 
-
-// KONSTRUKTOR
+// konstruktor
 Game::Game()
 {
     this->initializeWindow();
     this->initializeBackground();
+    this->initializeMusic();
     this->initializeTextures();
     this->initializePlayer();
     this->initializeEnemies();
     this->initializeGUI();
 }
+
 // DESTRUKTOR
 Game::~Game()
 {
@@ -106,8 +132,8 @@ Game::~Game()
     for (auto &tex : textures)
     {
         delete tex.second;
-//        delete tex.first;
     }
+
     // usuwanie pociskow
     for (auto &bull : bullets)
     {
@@ -117,6 +143,7 @@ Game::~Game()
     {
         delete bull;
     }
+
     //usuwanie bonusow
     for (auto &bon : bonuses)
     {
@@ -142,15 +169,8 @@ Game::~Game()
     {
         delete boss;
     }
-
 }
 
-
-
-
-
-
-//funkcje publiczne
 
 // funkcja glowna
 void Game::run()
@@ -190,7 +210,7 @@ void Game::updateInput()
     float dy = curPos.y - mouse_position.y;
     const float PI = 3.14159265;
     float rotation = std::atan2(dy,dx)*180.0/PI;    
-//    std::cout<<mouse_position.x<<"\t"<<mouse_position.y<<std::endl;               //debuger pozycji myszy
+//    std::cout<<mouse_position.x<<"\t"<<mouse_position.y<<std::endl;
 
     player->setRotation(rotation-90);
 
@@ -267,13 +287,11 @@ void Game::updateBossBullets()
     {
         if(boss->canAttack())
         {
-//            getRotation2 stad trzeba wziac kat strzelania bossa
-            boss->updateAttack();
-            this->boss_bullets.push_back(new BossBullet(textures["BULLET3"],    //tekstura              // dol
-                                         boss->getPos().x, boss->getPos().y,    // pozycje
-                                         cos(boss->getRotation() * M_PI /180), sin(boss->getRotation() * M_PI /180),//boss->getRotation2(boss) //0,5.f      // kierunki
-                                         10.f));                                // predkosc
-            this->boss_bullets.push_back(new BossBullet(textures["BULLET3"],                            // gora
+            this->boss_bullets.push_back(new BossBullet(textures["BULLET3"],                  // dol                    //tekstura
+                                         boss->getPos().x, boss->getPos().y,                                            // pozycje
+                                         cos(boss->getRotation() * M_PI /180), sin(boss->getRotation() * M_PI /180),    // kierunki
+                                         10.f));                                                                        // predkosc
+            this->boss_bullets.push_back(new BossBullet(textures["BULLET3"],                  // gora
                                          boss->getPos().x, boss->getPos().y,
                                          -cos(boss->getRotation() * M_PI /180), -sin(boss->getRotation() * M_PI /180),
                                          10.f));
@@ -285,7 +303,7 @@ void Game::updateBossBullets()
     }
 }
 
-void Game::updateBonuses()
+void Game::updateBonuses()                  // apteczka
 {
     int counter = 0;
     for (auto *bon : bonuses)
@@ -294,10 +312,7 @@ void Game::updateBonuses()
 
         if(bon->getBounds().top + bon->getBounds().height > window_height)
         {
-            //usuwanie konkretnego wskaznika
 //            delete this->bonuses.at(counter);
-
-            //usuwanie go z wektora
             this->bonuses.erase(this->bonuses.begin()+counter);
             --counter;
         }
@@ -312,7 +327,7 @@ void Game::updateBonuses()
     }
 }
 
-void Game::updateBonuses2()//clock_t initTime
+void Game::updateBonuses2()                 // tarcza
 {
     int counter = 0;
     for (auto *bon2 : bonuses2)
@@ -329,7 +344,7 @@ void Game::updateBonuses2()//clock_t initTime
             --counter;
         }
 
-        if( player->getBounds().intersects( bon2->getBounds() ) )               // kolizja bonusu 2 z nami ( ma dzialac na 5 sekund )
+        if( player->getBounds().intersects( bon2->getBounds() ) )               // kolizja bonusu 2 z nami
         {
             if(!player->czyMaTarcze)
             {
@@ -363,7 +378,7 @@ void Game::updateBonuses2()//clock_t initTime
     }
 }
 
-void Game::updateBonuses3()
+void Game::updateBonuses3()             // more bullets
 {
     int counter = 0;
     for (auto *bon3 : bonuses3)
@@ -372,10 +387,6 @@ void Game::updateBonuses3()
 
         if(bon3->getBounds().top + bon3->getBounds().height > window_height)            // zderzenie bonusu z krawedzia
         {
-            //usuwanie konkretnego wskaznika
-//            delete this->bonuses3.at(counter);
-
-            //usuwanie go z wektora
             this->bonuses3.erase(this->bonuses3.begin()+counter);
             --counter;
         }
@@ -420,8 +431,8 @@ void Game::updateEnemies()                                                      
         for (int i = 0; i<10; i++)
         {
             this->enemies.push_back(new Enemy(this->textures["ENEMY1"],
-                                    // w 3 zmiennej przesuwamy przedzial ( obie granice prawo-lewo lub gora-dol )
-                                    getRandomPosition(window_width,window_height,50).first,getRandomPosition(window_width,window_height,420).second,
+                                    // w 2 i 3 zmiennej przesuwamy przedzial ( obie granice prawo-lewo lub gora-dol )
+                                    getRandomPosition(window_width,window_height,50).first, getRandomPosition(window_width,window_height,420).second,
                                     2.f, 2.f,
                                     2.f, 0.7,
                                     0.7, 5));
@@ -453,8 +464,13 @@ void Game::updateEnemies()                                                      
                                     1.2,20));
         }
     }
+
     if(spawnRule == 23.f and enemies.empty())                                      // BOSS
     {
+        music.stop();
+        music2.openFromFile("./../space_shooter/Muzyka/Cyberwildlife-Park-Cyberpunk-2077-Soundtrack.wav");
+        music2.play();
+
         updateTimer();
         for (int i = 0; i<1; i++)
         {
@@ -479,7 +495,7 @@ void Game::updateEnemies()                                                      
         boss->update(1);
         if(boss->getHP() <= 50)
         {
-            boss->update(2);
+            boss->update(2);                    // przyspieszenie ruchu bossa
             boss->speedUpAttack();              // przyspieczenie ataku bossa
         }
     }
@@ -492,9 +508,9 @@ int Game::Hit(int howMany)
 
 void Game::updateCombat()                                                           // KOLIZJE / WALKA
 {
-    // 1. nasze pociski z czyms
-    // 2. nasz statek z czyms
-    // 3.pocisk wroga z czyms
+    // 1.x nasze pociski z czyms
+    // 2.x nasz statek z czyms
+    // 3.x pocisk wroga z czyms
     for (int i = 0; i < static_cast<int>(this->enemies.size()); i++)
     {
         for(int j=0; j< static_cast<int>(this->bullets.size()); j++)
@@ -515,14 +531,19 @@ void Game::updateCombat()                                                       
 
                     this->enemies.erase(this->enemies.begin() +i);  //usuwanie obiektu z wektora
 
-                    ///
-                    /// miejsce na wybuchy
-                    ///
+
+//                    this->wybuchy.push_back(new Explosion(enemies[i]->getPos().x, enemies[i]->getPos().y));     // wybuchy
+//                    for(auto* expl : wybuchy)
+//                    {
+//                        expl->updateTextures(expl_textures);
+//                    }
+
+
                     if (x < 2)                                                          // szansa na wypadniecie tego konretnego bonusu
                     {
                         this->bonuses.push_back(new Bonus(this->textures["BONUS1"],     // apteczka
-                                                enemies[i]->getPos().x,//50
-                                                enemies[i]->getPos().y, //100
+                                                enemies[i]->getPos().x,
+                                                enemies[i]->getPos().y,
                                                 0.f,
                                                 10.f,
                                                 1.0f));
@@ -570,7 +591,7 @@ void Game::updateCombat()                                                       
                 bossess[i]->decreaseHP();
                 this->bullets.erase(this->bullets.begin() +j);
 
-                if (bossess[i]->getHP() <= 0)   // usuwanie bossa
+                if (bossess[i]->getHP() <= 0)               // usuwanie bossa
                 {
                     this->bossess.erase(this->bossess.begin() +i);
                 }
@@ -696,6 +717,12 @@ void Game::render()
     // rysowanie wszystkiego
     this->renderBackground();
     this->player->render(player,*this->window);
+
+//    //wybuchy
+//    for (auto *expl : wybuchy)
+//    {
+//        expl->render(expl,window);
+//    }
 
     for (auto *bull : bullets)
     {

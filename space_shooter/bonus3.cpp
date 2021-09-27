@@ -7,7 +7,6 @@ bonus3::bonus3()
 
 }
 
-
 const sf::FloatRect bonus3::getBounds() const
 {
     return this->shape.getGlobalBounds();
@@ -19,7 +18,6 @@ bonus3::bonus3(sf::Texture *texture, float posX, float posY, float dirX, float d
     this->shape.setScale(2,2);
 
     this->shape.setPosition(posX,posY);
-//    this->shape.scale(0.5,0.5);
     this->direction.x = dirX;
     this->direction.y = dirY;
     this->movementSpeed = movement_speed;

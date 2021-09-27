@@ -20,14 +20,16 @@ public:
 
     // krawedzie grafiki
     const sf::FloatRect getBounds() const;
+
     //uzdrawianie
     int heal(int heal_);
     int setHeal(int howMany);
 
+    // ruch
     void update();
+
+    // rysowanie
     void render(sf::RenderTarget *target);
-
-
 };
 
 

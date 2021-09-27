@@ -1,18 +1,16 @@
 #include "enemy.h"
 //#include "explosion.h"
 
-//Enemy::Enemy()
-//:      damage(1),
-//       attackCooldownMax(100.f),
-//       attackCooldown(attackCooldownMax)
-//{
-//}
+Enemy::Enemy()
+{
 
+}
 
-sf::FloatRect Enemy::getBounds() // tu musi byc kopia bo bedzie sie bugowac (pamiec dynamiczna)
+sf::FloatRect Enemy::getBounds() // tu musi byc kopia bo bedzie sie bugowac
 {
     return getGlobalBounds();
 }
+
 const sf::Vector2f &Enemy::getPos() const
 {
     return getPosition();
@@ -48,11 +46,12 @@ Enemy::Enemy(sf::Texture *texture, float posX, float posY, float dirX, float dir
     setTexture(*texture);
     setPosition(posX,posY);
     scale(scaleX,scaleY);
+    setOrigin(93/2,84/2);
+    this->HP = hp;
+
     this->direction.x = dirX;
     this->direction.y = dirY;
     this->movementSpeed = movement_speed;
-    setOrigin(93/2,84/2);
-    this->HP = hp;
 }
 
 Enemy::~Enemy()
@@ -89,11 +88,11 @@ void Enemy::update()
         {
             direction.y = -(direction.y);
         }
-        if(rectangle_bounds.left+rectangle_bounds.width > 500) // wartosci stale
+        if(rectangle_bounds.left+rectangle_bounds.width > 500)
         {
             direction.x = -(direction.x);
         }
-        if(rectangle_bounds.left < 0) //rectangle_bounds.left  < 0 dla tego przypadku dziwnie nie dziala
+        if(rectangle_bounds.left < 0)
         {
             direction.x = -(direction.x);
         }

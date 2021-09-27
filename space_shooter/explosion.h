@@ -1,26 +1,28 @@
-//#ifndef EXPLOSION_H
-//#define EXPLOSION_H
-//#include <iostream>
-//#include<SFML/Graphics.hpp>
+#ifndef EXPLOSION_H
+#define EXPLOSION_H
+#include <iostream>
+#include<SFML/Graphics.hpp>
 
-//class Explosion
-//{
-//private:
+class Explosion : sf::Sprite
+{
+private:
 //    sf::Sprite sprite;
-//    std::vector<sf::Sprite> animacje;
-//    int counter;
-//    int maxCounter;
 
-//public:
-//    Explosion();
-//    Explosion(std::vector<sf::Texture> &textures, float posX, float posY, float switchTime);
-//    virtual ~Explosion();
+    int maxCounter;
+    int counter;
 
-//    void update();
-//    int getCounter();
-//    void render(sf::RenderTarget *target);
-//};
+public:
+    Explosion();
+    Explosion(float posX, float posY);
+    virtual ~Explosion();
+
+    bool timer();
+    void updateTextures(std::vector<std::pair<std::string,sf::Texture*>> explosion_textures);
+    void update();
+    int getCounter();
+    void render(Explosion* sprite, sf::RenderTarget *target);
+};
 
 
 
-//#endif // EXPLOSION_H
+#endif // EXPLOSION_H

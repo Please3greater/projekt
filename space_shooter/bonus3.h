@@ -1,10 +1,9 @@
 #ifndef BONUS3_H
 #define BONUS3_H
-
-
 #pragma once
 #include <iostream>
 #include<SFML/Graphics.hpp>
+
 
 class bonus3
 {
@@ -21,14 +20,14 @@ public:
 
     // krawedzie grafiki
     const sf::FloatRect getBounds() const;
+
     //uzdrawianie
     int heal(int heal_);
     int setHeal(int howMany);
 
     void update();
     void render(sf::RenderTarget *target);
-
-
 };
+
 
 #endif // BONUS3_H
